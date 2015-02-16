@@ -1,4 +1,4 @@
-# Client PHP de l'API SOAP Yousign (v1.2.2)
+# Client PHP de l'API SOAP Yousign (v1.3.0)
 
 ## Description
 
