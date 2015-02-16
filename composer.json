@@ -1,0 +1,40 @@
+{
+    "name": "yousign/yousign-api-client",
+    "description": "A PHP client for the Yousign API",
+    "type": "library",
+    "minimum-stability": "dev",
+    "authors": [
+        {
+            "name": "Kevin Auvinet",
+            "email": "kevin.auvinet@yousign.fr"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "nusphere/nusoap",
+                "version": "0.9.5",
+                "dist": {
+                    "url": "http://downloads.sourceforge.net/project/nusoap/nusoap/0.9.5/nusoap-0.9.5.zip",
+                    "type": "zip"
+                },
+                "autoload": {
+                    "classmap": ["lib/"]
+                }
+            }
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "nusphere/nusoap": "0.9.5"
+    },
+    "autoload" : {
+        "psr-4": {"YousignAPI\\": "src/"}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
