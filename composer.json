@@ -2,7 +2,6 @@
     "name": "yousign/yousign-api-client",
     "description": "A PHP client for the Yousign API",
     "type": "library",
-    "minimum-stability": "dev",
     "authors": [
         {
             "name": "Kevin Auvinet",
