@@ -34,7 +34,7 @@ Ajoutez dans votre fichier composer.json :
         
         "require": 
         {
-            "yousign/yousign-api-client": "1.3.*@dev"
+            "yousign/yousign-api-client": "~1.3"
         }
     }
 ```
