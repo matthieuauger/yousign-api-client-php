@@ -15,9 +15,8 @@ Ajoutez dans votre fichier composer.json :
 
 ```json
     {
-        // ...
-        "require": {
-            // ...
+        "require": 
+        {
             "yousign/yousign-api-client-php": "~1.3",
         }
     }
