@@ -15,6 +15,23 @@ Ajoutez dans votre fichier composer.json :
 
 ```json
     {
+        "repositories":  [
+            {
+                "type": "package",
+                "package": {
+                    "name": "nusphere/nusoap",
+                    "version": "0.9.5",
+                    "dist": {
+                        "url": "http://downloads.sourceforge.net/project/nusoap/nusoap/0.9.5/nusoap-0.9.5.zip",
+                        "type": "zip"
+                    },
+                    "autoload": {
+                        "classmap": ["lib/"]
+                    }
+                }
+            }
+        ],
+        
         "require": 
         {
             "yousign/yousign-api-client-php": "~1.3",
