@@ -2,3 +2,4 @@
 vendor
 ysApiParameters.ini
 composer.lock
+examples/*.pdf

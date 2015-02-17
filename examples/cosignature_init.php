@@ -113,8 +113,12 @@ if($result === false) {
 } 
 else 
 {
-    // Récupération des "token" et création des liens d'accès aux documents à signer
-    // 
+    // Récupération des "tokens" et création des liens d'accès aux documents à signer
+    
+    // S'il n'y a qu'un seul token, on met la variable sous forme de tableau
+    if(isset($result['tokens']['token']))
+        $result['tokens'] = array($result['tokens']);
+
     // Remarque : 
     // ----------
     // L'url d'accès aux documents ci-dessous est https://demo.yousign.fr/public/ext/cosignature/<token>

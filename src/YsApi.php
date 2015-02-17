@@ -329,8 +329,12 @@ class YsApi
      */
     public function getErrors()
     {
+        if(false === $this->errors)
+            $this->errors = array();
+
         if(!is_array($this->errors))
             $this->errors = array($this->errors);
+        
         return $this->errors;
     }
 
