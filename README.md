@@ -1,8 +1,8 @@
-# Client PHP de l'API SOAP Yousign (v1.2.2)
+# Client PHP de l'API SOAP Yousign (v1.3.0)
 
 ## Description
 
-Ce client permet d'utiliser l'API Soap de Yousign via le langage PHP.
+Ce client permet d'utiliser l'[API Soap de Yousign](http://developer.yousign.fr) via le langage PHP.
 
 ## Eléments requis
 
