@@ -97,7 +97,7 @@ services:
     yousign.client:
         class: "%yousign.client.class%"
         arguments:
-            - "%yousign_parameters_file%"
+            - "%kernel.root_dir%/../%yousign_parameters_file%"
 ```
 
 Il ne vous reste plus qu'à utiliser le client comme un service.
