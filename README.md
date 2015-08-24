@@ -41,7 +41,7 @@ Ajoutez dans votre fichier composer.json :
     }
 ```
 
-Ensuite lancez Composer via `php composer.phar update`
+Ensuite lancez Composer via `php composer.phar update yousign/yousign-api-client`
 
 ## Installation sans Composer
 
