@@ -5,7 +5,7 @@ namespace YousignAPI;
 class YsApi
 {
     const API_NAMESPACE = 'http://www.yousign.com';
-    
+
     const API_ENV_DEMO = 'demo';
     const API_ENV_PROD = 'prod';
 
@@ -16,135 +16,149 @@ class YsApi
     const IFRAME_URL_PROD = 'https://yousign.fr';
 
     /**
-     * URL d'accès au WSDL de l'API Yousign d'authentification
+     * URL d'accès au WSDL de l'API Yousign d'authentification.
+     *
      * @var string
      */
-	private $URL_WSDL_AUTH = "";
-        
-    /**
-     * URL d'accès au WSDL de l'API Yousign de Co-signature
-     * @var string
-     */
-    private $URL_WSDL_COSIGN = "";
+    private $URL_WSDL_AUTH = '';
 
     /**
-     * URL d'accès au WSDL de l'API Yousign d'archivage
+     * URL d'accès au WSDL de l'API Yousign de Co-signature.
+     *
      * @var string
      */
-    private $URL_WSDL_ARCHIVE = "";
-
-	/**
-     * Contient le login de connexion au web service de l'utilisateur courant
-     * @var string
-     */
-	private $_login = "";
-	
-	/**
-     * Contient le mot de passe de connexion au web service en sha1
-     * @var string
-     */
-	private $_password = "";
-	
-    /**
-     * La clé d'API
-     * @var string
-     */
-    private $apikey = "";
+    private $URL_WSDL_COSIGN = '';
 
     /**
-     * Url d'accès à l'API
+     * URL d'accès au WSDL de l'API Yousign d'archivage.
+     *
      * @var string
      */
-    private $urlApi = "";
+    private $URL_WSDL_ARCHIVE = '';
 
     /**
-     * URL d'accès à l'Iframe
+     * Contient le login de connexion au web service de l'utilisateur courant.
+     *
      * @var string
      */
-    private $urlIframe = "";
+    private $_login = '';
 
     /**
-     * Définit l'utilisation ou non du protocol SSL
-     * @var boolean
+     * Contient le mot de passe de connexion au web service en sha1.
+     *
+     * @var string
+     */
+    private $_password = '';
+
+    /**
+     * La clé d'API.
+     *
+     * @var string
+     */
+    private $apikey = '';
+
+    /**
+     * Url d'accès à l'API.
+     *
+     * @var string
+     */
+    private $urlApi = '';
+
+    /**
+     * URL d'accès à l'Iframe.
+     *
+     * @var string
+     */
+    private $urlIframe = '';
+
+    /**
+     * Définit l'utilisation ou non du protocol SSL.
+     *
+     * @var bool
      */
     private $enabledSSL = false;
 
     /**
-     * Emplacement du keystore client (SSL doit être actif)
-     * 
+     * Emplacement du keystore client (SSL doit être actif).
+     *
      * @var string
      */
-    private $certClientLocation = ""; 
+    private $certClientLocation = '';
 
     /**
-     * Emplacement de la chaine de certification (SSL doit être actif)
-     * 
+     * Emplacement de la chaine de certification (SSL doit être actif).
+     *
      * @var string
      */
-    private $caChainClientLocation = "";
+    private $caChainClientLocation = '';
 
     /**
-     * Emplacement de la clef privée client  (SSL doit être actif)
-     * 
+     * Emplacement de la clef privée client  (SSL doit être actif).
+     *
      * @var string
      */
-    private $privateKeyClientLocation = "";
+    private $privateKeyClientLocation = '';
 
     /**
-     * Mot de passe de la clef privée client  (SSL doit être actif)
-     * 
+     * Mot de passe de la clef privée client  (SSL doit être actif).
+     *
      * @var string
      */
-    private $privateKeyClientPassword = "";
-
-	/**
-     * Définit si l'utilisateur est bien authentifié ou non
-     * @var boolean
-     */
-	private $isAuthenticated = false;
+    private $privateKeyClientPassword = '';
 
     /**
-     * Contient les paramètres d'accès à l'api pki
+     * Définit si l'utilisateur est bien authentifié ou non.
+     *
+     * @var bool
+     */
+    private $isAuthenticated = false;
+
+    /**
+     * Contient les paramètres d'accès à l'api pki.
+     *
      * @var array
      */
     private $parameters = null;
 
     /**
-     * Gestion des erreurs
+     * Gestion des erreurs.
+     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Instance du client
-     * @var SoapClient
+     * Instance du client.
+     *
+     * @var \nusoap_client
      */
     private $client;
 
-	/**
-	 * Permet de créer une nouvelle instance de la classe ysApi
+    /**
+     * Permet de créer une nouvelle instance de la classe ysApi.
      *
      * Il est possible de passer en paramètre le chemin d'un fichier properties (.ini)
-     * 
+     *
      * Si c'est le cas, il peut contenir les clés suivantes :
      *     - url_api    : L'url d'accès à l'API
      *     - login      : L'identifiant Yousign (adresse email)
      *     - password   : Mot de passe Yousign
      *     - api_key    : La clé d'API
-	 * 
-     * @param $pathParametersFile : Chemin du fichier de configuration
-     * @return YousignAPI_YsApi
-	 */
-	function __construct($pathParametersFile = null)
-	{
-        if($pathParametersFile !== null && file_exists($pathParametersFile))
+     *
+     * @param null $pathParametersFile : Chemin de configuration
+     */
+    public function __construct($pathParametersFile = null)
+    {
+        if ($pathParametersFile !== null && file_exists($pathParametersFile)) {
             $this->parseParametersFile($pathParametersFile);
+        }
     }
 
     /**
-     * Modifie l'environnement de l'API utilisé
-     * 
-     * @param string $environment (demo|prod)
+     * Modifie l'environnement de l'API utilisé. (env|prod)
+     *
+     * @param $environment
+     * @return $this
      */
     public function setEnvironment($environment)
     {
@@ -153,6 +167,7 @@ class YsApi
             case self::API_ENV_PROD:
                 $this->setUrlIframe(self::IFRAME_URL_PROD);
                 $this->setUrlApi(self::API_URL_PROD);
+
                 return $this;
 
             // Par défaut, environnement de démo
@@ -160,32 +175,34 @@ class YsApi
             default:
                 $this->setUrlIframe(self::IFRAME_URL_DEMO);
                 $this->setUrlApi(self::API_URL_DEMO);
+
                 return $this;
         }
     }
 
     /**
-     * Modifie l'url d'accès à l'API
-     * 
-     * @param string $urlApi
-     * @return  YousignAPI_YsApi
+     * Modifie l'url d'accès à l'API.
+     *
+     * @param $urlApi
+     * @return $this
      */
     public function setUrlApi($urlApi)
     {
         $this->urlApi = $urlApi;
 
         // On créé les adresses des wsdl
-        $this->URL_WSDL_AUTH = $this->urlApi."/AuthenticationWS/AuthenticationWS?wsdl";
-        $this->URL_WSDL_COSIGN = $this->urlApi."/CosignWS/CosignWS?wsdl";
-        $this->URL_WSDL_ARCHIVE = $this->urlApi."/ArchiveWS/ArchiveWS?wsdl";
+        $this->URL_WSDL_AUTH = $this->urlApi.'/AuthenticationWS/AuthenticationWS?wsdl';
+        $this->URL_WSDL_COSIGN = $this->urlApi.'/CosignWS/CosignWS?wsdl';
+        $this->URL_WSDL_ARCHIVE = $this->urlApi.'/ArchiveWS/ArchiveWS?wsdl';
+
         return $this;
     }
 
     /**
      * Modifie l'URL d'accès à l'Iframe.
      *
-     * @param string $urlIframe
-     * @return YousignAPI_YsApi
+     * @param $urlIframe
+     * @return $this
      */
     public function setUrlIframe($urlIframe)
     {
@@ -195,10 +212,10 @@ class YsApi
     }
 
     /**
-     * Modification de l'identifiant d'accès à l'API
-     * 
-     * @param string $login
-     * @return YousignAPI_YsApi
+     * Modification de l'identifiant d'accès à l'API.
+     *
+     * @param $login
+     * @return $this
      */
     public function setLogin($login)
     {
@@ -208,9 +225,10 @@ class YsApi
     }
 
     /**
-     * Modification du mot de passe d'accès à l'API
-     * 
-     * @param string $password mot de passe encodé
+     * Modification du mot de passe d'accès à l'API.
+     *
+     * @param $password
+     * @return $this
      */
     public function setPassword($password)
     {
@@ -220,10 +238,10 @@ class YsApi
     }
 
     /**
-     * Modification de la clé d'API Yousign
-     * 
-     * @param string $apikey clé d'API
-     * @return YousignAPI_YsApi
+     * Modification de la clé d'API Yousign.
+     *
+     * @param $apikey
+     * @return $this
      */
     public function setApiKey($apikey)
     {
@@ -233,10 +251,10 @@ class YsApi
     }
 
     /**
-     * Active ou non l'utilisation de SSL
-     * 
-     * @param  boolean $enabled
-     * @return YousignAPI_YsApi
+     * Active ou non l'utilisation de SSL.
+     *
+     * @param $enabled
+     * @return $this
      */
     public function setEnabledSSL($enabled)
     {
@@ -246,10 +264,10 @@ class YsApi
     }
 
     /**
-     * Modification de l'emplacement de la chaine de certification
-     * 
-     * @param string $ca_chain_client_location the ca chain client location
-     * @return YousignAPI_YsApi
+     * Modification de l'emplacement de la chaine de certification.
+     *
+     * @param $ca_chain_client_location
+     * @return $this
      */
     public function setCaChainClientLocation($ca_chain_client_location)
     {
@@ -261,9 +279,8 @@ class YsApi
     /**
      * Modification de l'emplacement de la clef privée client  (SSL doit être actif).
      *
-     * @param string $privateKeyClientLocation the private key client location 
-     *
-     * @return YousignAPI_YsApi
+     * @param $privateKeyClientLocation
+     * @return $this
      */
     public function setPrivateKeyClientLocation($privateKeyClientLocation)
     {
@@ -275,9 +292,8 @@ class YsApi
     /**
      * Modification du mot de passe de la clef privée client  (SSL doit être actif).
      *
-     * @param string $privateKeyClientPassword the private key client password 
-     *
-     * @return YousignAPI_YsApi
+     * @param $privateKeyClientPassword
+     * @return $this
      */
     public function setPrivateKeyClientPassword($privateKeyClientPassword)
     {
@@ -289,9 +305,8 @@ class YsApi
     /**
      * Modification de l'emplacement du keystore client (SSL doit être actif).
      *
-     * @param string $certClientLocation the cert client location 
-     *
-     * @return YousignAPI_YsApi
+     * @param $certClientLocation
+     * @return $this
      */
     public function setCertClientLocation($certClientLocation)
     {
@@ -301,10 +316,10 @@ class YsApi
     }
 
     /**
-     * Cryptage du mot de passe
-     * 
-     * @param  string $password mot de passe en clair
-     * @return string mot de passe crypté
+     * Cryptage du mot de passe.
+     *
+     * @param $password
+     * @return string
      */
     public function encryptPassword($password)
     {
@@ -312,9 +327,9 @@ class YsApi
     }
 
     /**
-     * Retourne l'url d'accès à l'iframe de signature du document
-     * 
-     * @param  string $token
+     * Retourne l'url d'accès à l'iframe de signature du document.
+     *
+     * @param string $token
      * @return string
      */
     public function getIframeUrl($token = '')
@@ -323,183 +338,179 @@ class YsApi
     }
 
     /**
-     * Retourne les erreurs retournées par l'API
-     * 
+     * Retourne les erreurs retournées par l'API.
+     *
      * @return array
      */
     public function getErrors()
     {
-        if(false === $this->errors)
+        if (false === $this->errors) {
             $this->errors = array();
+        }
 
-        if(!is_array($this->errors))
+        if (!is_array($this->errors)) {
             $this->errors = array($this->errors);
-        
+        }
+
         return $this->errors;
     }
 
     /**
-     * Retourne l'instance du client soap utilisé
-     * 
-     * @return SoapClient
+     * Retourne l'instance du client soap utilisé.
+     *
+     * @return \SoapClient
      */
     public function getClient()
     {
         return $this->client;
     }
 
-	
-	/**
-	 * fonction de connexion à l'API
-	 * @return TRUE si l'utilisateur peut se connecter, FALSE sinon
-	 */
-	public function connect()
-	{
-		// Paramètre du service de connexion
+    /**
+     * Connexion à l'API.
+     *
+     * @return bool
+     */
+    public function connect()
+    {
+        // Paramètre du service de connexion
         //@todo : supprimer ce paramètre ??
-		$params = array(
-    		'arg0' => '1'
-		);
+        $params = array(
+            'arg0' => '1',
+        );
 
         $this->client = $this->setClientSoap($this->URL_WSDL_AUTH);
-		$result = $this->client->call('connect', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
+        $result = $this->client->call('connect', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
 
-		if ($this->client->fault) 
-		{
+        if ($this->client->fault) {
             $this->errors[] = $this->client->faultstring;
-			return false;
-		} 
-		else 
-		{
-			$err = $this->client->getError();
-			if ($err) 
-			{
+
+            return false;
+        } else {
+            $err = $this->client->getError();
+            if ($err) {
                 $this->errors = $err;
-				return $err;
-			} 
-			else 
-			{
-				if($result == "true")
-				{
-					$this->isAuthenticated = true;
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
-	}
-    
+
+                return $err;
+            } else {
+                if ($result == 'true') {
+                    $this->isAuthenticated = true;
+
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
     /**
-     * Fonction permettant d'obtenir des informations sur une demande de cosignature spécifique
-     * 
-     * @param  integer $idDemand Id de la demande de cosignature
+     * Fonction permettant d'obtenir des informations sur une demande de cosignature spécifique.
+     *
+     * @param int $idDemand Id de la demande de cosignature
      * @return mixed Retourne :
-     *             - DEMAND_NOT_ALLOWED si l'id de la demande passé est incorrect
-     *             - false si une erreur est survenue
-     *             - Tableau contenant les informations de la demande de cosignature
-     *                 - dateCreation : Date de creation de la demande de signature
-     *                 - description : Description de la demande de signature
-     *                 - status : Status global de la demande de signature
-     *                 - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *                     * idFile : Id du fichier
-     *                     * fileName : Nom du fichier
-     *                     * cosignersWithStatus : Status de la signature pour chacun des signataires 
-     *                         + id : Id du signataire
-     *                         + status : Status de la signature
-     *                 - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *                     * firstName : Prénom
-     *                     * lastName : Nom
-     *                     * mail : Email
-     *                     * proofLevel : Niveau de preuve de la signature
-     *                     * isCosignerCalling : True si le token est associé au signataire, false sinon
-     *                     * id : Id du signataire
-     *                     * phone : Numéro de téléphone du signataire
-     *                 - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *                     * name : Nom + Prénom
-     *                     * email : Email
+     *               - DEMAND_NOT_ALLOWED si l'id de la demande passé est incorrect
+     *               - false si une erreur est survenue
+     *               - Tableau contenant les informations de la demande de cosignature
+     *               - dateCreation : Date de creation de la demande de signature
+     *               - description : Description de la demande de signature
+     *               - status : Status global de la demande de signature
+     *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
+     *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
+     *                   * proofLevel : Niveau de preuve de la signature
+     *                   * isCosignerCalling : True si le token est associé au signataire, false sinon
+     *                   * id : Id du signataire
+     *                   * phone : Numéro de téléphone du signataire
+     *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
-    public function getCosignInfoFromIdDemand($idDemand) {
+    public function getCosignInfoFromIdDemand($idDemand)
+    {
         return $this->getCosignInfo(array('idDemand' => $idDemand));
     }
 
     /**
-     * Fonction permettant de récupérer les informations d'une demande de co-signature en fonction du token
-     * 
-     * @param  string $token : Token unique associé à une demande de cosignature
+     * Fonction permettant de récupérer les informations d'une demande de co-signature en fonction du token.
+     *
+     * @param string $token : Token unique associé à une demande de cosignature
      * @return mixed Retourne :
-     *             - INVALID_TOKEN si le token passé est incorrect
-     *             - false si une erreur est survenue
-     *             - Tableau contenant les informations de la demande de cosignature
-     *                 - dateCreation : Date de creation de la demande de signature
-     *                 - description : Description de la demande de signature
-     *                 - status : Status global de la demande de signature
-     *                 - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *                     * idFile : Id du fichier
-     *                     * fileName : Nom du fichier
-     *                     * cosignersWithStatus : Status de la signature pour chacun des signataires 
-     *                         + id : Id du signataire
-     *                         + status : Status de la signature
-     *                 - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *                     * firstName : Prénom
-     *                     * lastName : Nom
-     *                     * mail : Email
-     *                     * proofLevel : Niveau de preuve de la signature
-     *                     * isCosignerCalling : 
-     *                     * id : Id du signataire
-     *                     * phone : Numéro de téléphone du signataire
-     *                 - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *                     * name : Nom + Prénom
-     *                     * email : Email
+     *               - INVALID_TOKEN si le token passé est incorrect
+     *               - false si une erreur est survenue
+     *               - Tableau contenant les informations de la demande de cosignature
+     *               - dateCreation : Date de creation de la demande de signature
+     *               - description : Description de la demande de signature
+     *               - status : Status global de la demande de signature
+     *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
+     *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
+     *                   * proofLevel : Niveau de preuve de la signature
+     *                   * isCosignerCalling :
+     *                   * id : Id du signataire
+     *                   * phone : Numéro de téléphone du signataire
+     *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
-    public function getCosignInfoFromToken($token) {
+    public function getCosignInfoFromToken($token)
+    {
         return $this->getCosignInfo(array('token' => $token), false);
     }
 
     /**
-     * Fonction permettant de récupérer un fichier signé d'une cosignature
-     * 
-     * @param  integer $idDemand    : Id de la demande de cosignature
-     * @param  integer $idFile      : Id du fichier signé à récupérer
+     * Fonction permettant de récupérer un fichier signé d'une cosignature.
+     *
+     * @param int $idDemand : Id de la demande de cosignature
+     * @param int $idFile   : Id du fichier signé à récupérer
      * @return mixed Retourne :
-     *             - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
-     *             - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée 
-     *             - false si une erreur est survenue
-     *             - un tableau contenant:
-     *                 -> fileName : Le nom du fichier
-     *                 -> file : Le fichier signé encodé en base64 
+     *               - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
+     *               - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée
+     *               - false si une erreur est survenue
+     *               - un tableau contenant:
+     *                   -> fileName : Le nom du fichier
+     *                   -> file : Le fichier signé encodé en base64
      */
     public function getCosignedFileFromIdDemand($idDemand, $idFile)
     {
         return $this->getCosignedFile(array('idDemand' => $idDemand, 'idFile' => $idFile));
-        
     }
 
     /**
-     * Fonction permettant de récupérer un fichier signer
-     * 
-     * @param  string $token    : Token unique associé à un signataire non enregistré
-     * @param  integer $idFile  : Id du fichier signé à récupérer
-     * @return mixed Retourne :
-     *             - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
-     *             - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée 
-     *             - false si une erreur est survenue
-     *             - un tableau contenant:
-     *                 -> fileName : Le nom du fichier
-     *                 -> file : Le fichier signé encodé en base64
+     * Fonction permettant de récupérer un fichier signer.
      *
-     * @todo récupérer tous les fichiers d'un coup (dans un zip)
+     * @param string $token  : Token unique associé à un signataire non enregistré
+     * @param int    $idFile : Id du fichier signé à récupérer
+     * @return mixed Retourne :
+     *               - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
+     *               - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée
+     *               - false si une erreur est survenue
+     *               - un tableau contenant:
+     *                   -> fileName : Le nom du fichier
+     *                   -> file : Le fichier signé encodé en base64
      */
     public function getCosignedFileFromToken($token, $idFile)
-    {        
-        return $this->getCosignedFile(array('token' => $token, 'idFile' => $idFile), false);    
+    {
+        return $this->getCosignedFile(array('token' => $token, 'idFile' => $idFile), false);
     }
-    
+
     /**
      * Cette méthode est utilisée pour initialiser une demande de cosignature.
      * Vous passerez en paramètre une liste de fichiers à signer ainsi qu'une liste d'informations des cosignataires.
+     *
      * Ils recevront ensuite un email contenant une URL unique pour accéder à l'interface de signature du/des documents afin de le/les signer.
      *
      * example:
@@ -576,80 +587,80 @@ class YsApi
      *         'initMail' => 'Contenu de l\'email'
      *         [...]
      *     );
-     * 
-     * @param  array $lstFiles          : Liste du/des fichiers à signer, chaque fichier doit définir:
-     *                                      - name : Nom du fichier à signer
-     *                                      - content : Contenu du fichier à signer encodé en base64
-     *                                      - idFile : identifiant unique (entier ou chaine de caractère)
-     * @param  array $lstPersons        : Liste des cosignataires, chaque cosignataire doit définir:
-     *                                      - firstName : Le prénom du cosignataire
-     *                                      - lastName : Le nom du cosignataire
-     *                                      - mail : L'email du cosignataire (ou un id si c'est en mode Iframe)
-     *                                      - phone : Le numéro de téléphone du cosignataire (indicatif requis, exemple: +33612326554)
-     *                                      - proofLevel : Niveau de preuve
-     *                                                     Disponible: LOW
-     *                                                     Par défaut: Rien
-     * @param  array $visibleOptions    : Liste d'informations requis pour le placement des signatures
-     *                                      - visibleSignaturePage : Numéro de la page contenant les signatures
-     *                                      - isVisibleSignature : Affiche ou non la signature sur le document
-     *                                      - visibleRectangleSignature : Les coordonnées de l'image de signature (ignoré si "isVisibleSignature" est à false)
-     *                                                                    Le format est "llx,lly,urx,ury" avec:
-     *                                                                      * llx: left lower x coordinate
-     *                                                                      * lly: left lower y coordinate
-     *                                                                      * urx: upper right x coordinate
-     *                                                                      * ury: upper right y coordinate
-     *                                      - mail : Email du cosignataire associée à la signature
-     * @param  string $message          : Message de l'email qui sera envoyé aux cosignataires (Non utilisé si initMailXXX définis)
-     * @param  array  $options          : Tableau d'options facultatifs
-     *                                      - initMailSubject : Sujet de l'email envoyé à tous les cosignataires à la création de la cosignature (Non utilisé en mode Iframe)
-     *                                      - initMail : Corps de l'email envoyé à tous les cosignataires à la création de la cosignature.
-     *                                                   Il doit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
-     *                                                   d'accès à l'interface de signature du/des documents. (Non utilisé en mode Iframe)  
-     *                                      - endMailSubject : Sujet de l'email envoyé lorsque tous les cosignataires ont signés le/les documents (Non utilisé en mode Iframe) 
-     *                                      - endMail : Corps de l'email envoyé lorsque tous les cosignataires ont signés le/les documents
-     *                                                  Il dit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
-     *                                                  d'accès à l'interface listant le/les documents signés (Non utilisé en mode Iframe) 
-     *                                      - language : Langue définie pour la cosignature. 
-     *                                                   Disponibles: FR|EN|DE 
-     *                                                   Par défaut: FR
-     *                                      - mode :     Mode d'utilisation (Aucun par défaut) 
-     *                                                     * IFRAME : Permet de signer directement dans l'application hébergeant l'iframe
-     *                                                                Ceci retournera un token pour chaque signataire
-     *                                                                L'URL devant appeler l'Iframe est:
-     *                                                                    => (Démo) https://demo.yousign.fr/public/ext/cosignature/{token} 
-     *                                                                    => (Prod) https://yousign.fr/public/ext/cosignature/{token}
-     *                                      - archive : Booléen permettant d'activer l'archivage du/des documents signés automatiquement
-     *                                                  L'archivage se fait lorsque tous les cosignataires ont signés
-     * @return mixed : Id de la demande de cosignature créée et liste des id des fichiers à signer 
-     *                 Si le mode "IFRAME" est définie, un token sera également retournée pour chaque cosignataire
-     *                 Pour associer le bon token au bon cosignataire, un email et un numéro de téléphone sont associés à chaque token
-     *                 (ou false si une erreur est survenue)
+     *
+     * @param array  $lstFiles       : Liste du/des fichiers à signer, chaque fichier doit définir:
+     *                                   - name : Nom du fichier à signer
+     *                                   - content : Contenu du fichier à signer encodé en base64
+     *                                   - idFile : identifiant unique (entier ou chaine de caractère)
+     * @param array  $lstPersons     : Liste des cosignataires, chaque cosignataire doit définir:
+     *                                   - firstName : Le prénom du cosignataire
+     *                                   - lastName : Le nom du cosignataire
+     *                                   - mail : L'email du cosignataire (ou un id si c'est en mode Iframe)
+     *                                   - phone : Le numéro de téléphone du cosignataire (indicatif requis, exemple: +33612326554)
+     *                                   - proofLevel : Niveau de preuve
+     *                                       Disponible: LOW
+     *                                       Par défaut: Rien
+     * @param array  $visibleOptions : Liste d'informations requis pour le placement des signatures
+     *                                   - visibleSignaturePage : Numéro de la page contenant les signatures
+     *                                   - isVisibleSignature : Affiche ou non la signature sur le document
+     *                                   - visibleRectangleSignature : Les coordonnées de l'image de signature (ignoré si "isVisibleSignature" est à false)
+     *                                     Le format est "llx,lly,urx,ury" avec:
+     *                                         * llx: left lower x coordinate
+     *                                         * lly: left lower y coordinate
+     *                                         * urx: upper right x coordinate
+     *                                         * ury: upper right y coordinate
+     *                                   - mail : Email du cosignataire associée à la signature
+     * @param string $message        : Message de l'email qui sera envoyé aux cosignataires (Non utilisé si initMailXXX définis)
+     * @param array  $options        : Tableau d'options facultatifs
+     *                                   - initMailSubject : Sujet de l'email envoyé à tous les cosignataires à la création de la cosignature (Non utilisé en mode Iframe)
+     *                                   - initMail : Corps de l'email envoyé à tous les cosignataires à la création de la cosignature.
+     *                                     Il doit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
+     *                                     d'accès à l'interface de signature du/des documents. (Non utilisé en mode Iframe)
+     *                                   - endMailSubject : Sujet de l'email envoyé lorsque tous les cosignataires ont signés le/les documents (Non utilisé en mode Iframe)
+     *                                   - endMail : Corps de l'email envoyé lorsque tous les cosignataires ont signés le/les documents
+     *                                     Il dit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
+     *                                     d'accès à l'interface listant le/les documents signés (Non utilisé en mode Iframe)
+     *                                   - language : Langue définie pour la cosignature.
+     *                                     Disponibles: FR|EN|DE
+     *                                     Par défaut: FR
+     *                                   - mode :     Mode d'utilisation (Aucun par défaut)
+     *                                       * IFRAME : Permet de signer directement dans l'application hébergeant l'iframe
+     *                                         Ceci retournera un token pour chaque signataire
+     *                                         L'URL devant appeler l'Iframe est:
+     *                                             => (Démo) https://demo.yousign.fr/public/ext/cosignature/{token}
+     *                                             => (Prod) https://yousign.fr/public/ext/cosignature/{token}
+     *                                   - archive : Booléen permettant d'activer l'archivage du/des documents signés automatiquement
+     *                                     L'archivage se fait lorsque tous les cosignataires ont signés
+     *
+     * @return mixed : Id de la demande de cosignature créée et liste des id des fichiers à signer
+     *               Si le mode "IFRAME" est définie, un token sera également retournée pour chaque cosignataire
+     *               Pour associer le bon token au bon cosignataire, un email et un numéro de téléphone sont associés à chaque token
+     *               (ou false si une erreur est survenue)
+     *
      * @category com.yousign.cosignejb
-     * @link http://developer.yousign.fr/com/yousign/cosignejb/CosignWS.html#CosignWS() 
+     *
+     * @link http://developer.yousign.fr/com/yousign/cosignejb/CosignWS.html#CosignWS()
      */
     public function initCoSign($lstFiles, $lstPersons, $visibleOptions, $message, $options = array())
-    {          
-        $payload = "";
+    {
+        $payload = '';
 
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
-        
+
         // A cause d'un soucis dans la librairie Nusoap, nous sommes obligés de créer nous même le payload afin qu'il corresponde à notre WSDL.
         // Le pb : Avec un tableau de paramètres, Nusoap créer cette arborescence : <files><item>...</item><item>...</item></files>
         // Nous avons besoin de cette arborescence : <files>...</files><files>...</files>. Les lignes suivantes permettent de bien la construire.
-        
+
         // Liste des fichiers de la co-signature
-        foreach ($lstFiles as $key => $file) 
-        {
-            $filePayload = "";
-            $visibleOptionsPayload = "";
-            
-            // On récupère les options de signature visible                
-            foreach ($visibleOptions[$file['idFile']] as $option) 
-            {
+        foreach ($lstFiles as $key => $file) {
+            $filePayload = '';
+            $visibleOptionsPayload = '';
+
+            // On récupère les options de signature visible
+            foreach ($visibleOptions[$file['idFile']] as $option) {
                 $item = array('visibleOptions' => $option);
-                foreach($item as $k => $v)
-                {
-                    $visibleOptionsPayload .= $this->client->serialize_val($v,$k,false,false,false,false,'encoded');                   
+                foreach ($item as $k => $v) {
+                    $visibleOptionsPayload .= $this->client->serialize_val($v, $k, false, false, false, false, 'encoded');
                 }
             }
 
@@ -657,9 +668,8 @@ class YsApi
             unset($file['idFile']);
 
             $item = array('lstCosignedFile' => $file);
-            foreach($item as $k => $v)
-            {
-                $filePayload .= $this->client->serialize_val($v,$k,false,false,false,false,'encoded');                   
+            foreach ($item as $k => $v) {
+                $filePayload .= $this->client->serialize_val($v, $k, false, false, false, false, 'encoded');
             }
 
             // On insert les données de signature visible
@@ -667,239 +677,230 @@ class YsApi
         }
 
         // Liste des co-signataires
-        foreach ($lstPersons as $person) 
-        {
+        foreach ($lstPersons as $person) {
             $item = array('lstCosignerInfos' => $person);
-            foreach($item as $k => $v)
-            {
-                $payload .= $this->client->serialize_val($v,$k,false,false,false,false,'encoded');                   
+            foreach ($item as $k => $v) {
+                $payload .= $this->client->serialize_val($v, $k, false, false, false, false, 'encoded');
             }
         }
-        
+
         // Ajout du message
-        $payload .= $this->client->serialize_val($message,'message',false,false,false,false,'encoded');
-        
+        $payload .= $this->client->serialize_val($message, 'message', false, false, false, false, 'encoded');
+
         // Envoi d'email
-        if(isset($options['initMailSubject']) && isset($options['initMail'])) {
+        if (isset($options['initMailSubject']) && isset($options['initMail'])) {
             $payload .= $this->client->serialize_val($options['initMailSubject'], 'initMailSubject', false, false, false, false, 'encoded');
             $payload .= $this->client->serialize_val($options['initMail'], 'initMail', false, false, false, false, 'encoded');
         }
-        
-        if(isset($options['endMailSubject']) && isset($options['endMail'])) {
+
+        if (isset($options['endMailSubject']) && isset($options['endMail'])) {
             $payload .= $this->client->serialize_val($options['endMailSubject'], 'endMailSubject', false, false, false, false, 'encoded');
             $payload .= $this->client->serialize_val($options['endMail'], 'endMail', false, false, false, false, 'encoded');
         }
 
-        if(isset($options['language'])) {
+        if (isset($options['language'])) {
             $payload .= $this->client->serialize_val($options['language'], 'language', false, false, false, false, 'encoded');
         }
 
-        if(isset($options['mode'])) {
+        if (isset($options['mode'])) {
             $payload .= $this->client->serialize_val($options['mode'], 'mode', false, false, false, false, 'encoded');
         }
 
-        if(isset($options['archive'])) {
+        if (isset($options['archive'])) {
             $payload .= $this->client->serialize_val($options['archive'], 'archive', false, false, false, false, 'encoded');
         }
 
         $result = $this->client->call('initCosign', $payload, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
 
-        if ($this->client->fault) 
-        {
-            $this->errors[] = $this->client->faultstring; 
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             return false;
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
-                if($result > 0)
-                {
+            } else {
+                if ($result > 0) {
                     return $result;
-                }
-                else
-                {
-                    $this->errors[] = 'No result'; 
+                } else {
+                    $this->errors[] = 'No result';
+
                     return false;
                 }
             }
         }
     }
-        
+
     /**
-     * fonction permettant d'obtenir le listing des co-signatures
+     * fonction permettant d'obtenir le listing des co-signatures.
      *
-     * @param  array $options
-     *             - [ search: Chaine de caractères permettant une recherche ]
-     *             - [ firstResult: index de début de recherche ]
-     *             - [ count: Nombre de résultats voulu ]
-     *             - [ status: Statut des signatures demandés ]
-     *             - [ dateBegin: Date de début ]
-     *             - [ dateEnd: Date de fin ]
+     * @param array $options
+     *                       - [ search: Chaine de caractères permettant une recherche ]
+     *                       - [ firstResult: index de début de recherche ]
+     *                       - [ count: Nombre de résultats voulu ]
+     *                       - [ status: Statut des signatures demandés ]
+     *                       - [ dateBegin: Date de début ]
+     *                       - [ dateEnd: Date de fin ]
+     *
      * @return array contenant pour chaque item
-     *             - cosignatureEvent : Id de la demande de cosignature
-     *             - dateCreation : Date de creation de la demande de signature
-     *             - status : Status global de la demande de signature
-     *             - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *                 * idFile : Id du fichier
-     *                 * fileName : Nom du fichier
-     *                 * cosignersWithStatus : Status de la signature pour chacun des signataires 
-     *                     + id : Id du signataire
-     *                     + status : Status de la signature
-     *             - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *                 * firstName : Prénom
-     *                 * lastName : Nom
-     *                 * mail : Email
-     *             - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *                 * name : Nom + Prénom
-     *                 * email : Email
+     *               - cosignatureEvent : Id de la demande de cosignature
+     *               - dateCreation : Date de creation de la demande de signature
+     *               - status : Status global de la demande de signature
+     *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
+     *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
+     *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
-	public function getListCosign(array $options = array())
-	{
-		// Paramètre du service de connexion
-        // @todo supprimer ce paramètre ??
+    public function getListCosign(array $options = array())
+    {
+        // Paramètre du service de connexion
         $params = $options;
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
-		$result = $this->client->call('getListCosign', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());		                                               
+        $result = $this->client->call('getListCosign', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
 
-		if ($this->client->fault) 
-		{
-            $this->errors[] = $this->client->faultstring; 
-			return false;
-		} 
-		else 
-		{
-			$err = $this->client->getError();
-			if ($err) 
-			{
-                $this->errors = $err; 
-				return $err;
-			} 
-			else 
-			{
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
+            return false;
+        } else {
+            $err = $this->client->getError();
+            if ($err) {
+                $this->errors = $err;
+
+                return $err;
+            } else {
                 // Si aucun résultat, une chaine vide est retournée, on la transforme en tableau vide
-                if(empty($result))
+                if (empty($result)) {
                     $result = array();
-				
+                }
+
                 // Si un seul résultat, on l'englobe dans un tableau
-                if(isset($result['status']))
+                if (isset($result['status'])) {
                     $result = array($result);
-                
+                }
+
                 return $result;
-			}
-		}
-	}
-    
+            }
+        }
+    }
+
     /**
-     * Permet de supprimer une co-signature
-     * 
-     * @param  integer $idDemand Id de la demande de cosignature à supprimer
-     * @return boolean
+     * Permet de supprimer une co-signature.
+     *
+     * @param $idDemand : Id de la demande de cosignature à supprimer
+     * @return bool
      */
     public function deleteCosignDemand($idDemand)
     {
         // Paramètre du service de connexion
         $params = array('idDemand' => $idDemand);
-        
-        $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
-        $result = $this->client->call('cancelCosignatureDemand', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());         
 
-        if ($this->client->fault) 
-        {
-            $this->errors[] = $this->client->faultstring; 
+        $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
+        $result = $this->client->call('cancelCosignatureDemand', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
+
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             return false;
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
-                if($result == false || $result == 'false')
-                {
+            } else {
+                if ($result == false || $result == 'false') {
                     return false;
                 }
-                return $result;                    
+
+                return $result;
             }
         }
     }
 
     /**
-     * Permet de relancer les co-signataires n'ayant pas signé lors d'une demande de cosignature
-     * 
-     * @param  integer $idDemand : Id de la demande de cosignature
-     * @return booléen
+     * Permet de relancer les co-signataires n'ayant pas signé lors d'une demande de cosignature.
+     *
+     * @param $idDemand : Id de la demande de cosignature
+     * @return bool
      */
     public function alertCosigners($idDemand)
     {
         // Paramètre du service de connexion
         $params = array(
-                        'idDemand' => $idDemand                            
+                        'idDemand' => $idDemand,
                         );
-        
+
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
-        $result = $this->client->call('alertCosigners', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());         
-                    
-        if ($this->client->fault) 
-        {
-            $this->errors[] = $this->client->faultstring;  
+        $result = $this->client->call('alertCosigners', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
+
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             return false;
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
-                if($result == false || $result == 'false')
-                {
+            } else {
+                if ($result == false || $result == 'false') {
                     return false;
                 }
-                return $result;                    
+
+                return $result;
             }
         }
     }
-        
-	/**
-	 * Permet de retourner l'état d'authentification de l'utilisateur courant
-	 * @return TRUE si l'utilisateur est authentifié, FALSE sinon
-	 */
-	public function isAuthenticated()
-	{
-	    return $this->isAuthenticated;
-	}
 
+    /**
+     * Retourne l'état d'authentification de l'utilisateur courant.
+     *
+     * @return bool
+     */
+    public function isAuthenticated()
+    {
+        return $this->isAuthenticated;
+    }
 
     /***********************************************************
      * WEB SERVICES D'ARCHIVAGE
-     ***********************************************************/	
+     ***********************************************************/
 
     /**
-     * Fonction permettant d'archiver un ensemble de documents
-     * @param @TODO : commenter les params
+     * Fonction permettant d'archiver un ensemble de documents.
+     *
+     * @param $fileB64
+     * @param $fileName
+     * @param $subject
+     * @param $date2
+     * @param $type
+     * @param $author
+     * @param $comment
+     * @param $ref
+     * @param $amount
+     * @param $tagsLst
+     * @return bool
      */
     public function archive($fileB64, $fileName, $subject, $date2, $type, $author, $comment, $ref, $amount, $tagsLst)
-    {          
-        $payload = "";
-        
+    {
         $this->client = $this->setClientSoap($this->URL_WSDL_ARCHIVE);
-        
+
         // Construction du tableau des paramètres
-        $fileParam = array( 'content' => $fileB64,
+        $fileParam = array('content' => $fileB64,
                             'fileName' => $fileName,
                             'subject' => $subject,
                             'date1' => date(DATE_RFC2822),
@@ -911,30 +912,25 @@ class YsApi
                             'amount' => $amount,
                             'generic1' => 'gen1',
                             'generic2' => 'gen2',
-                            'tag' => $tagsLst);
+                            'tag' => $tagsLst, );
 
         $params = array(
                 'file' => $fileParam,
             );
-        
-        $result = $this->client->call('archive', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());            
-        
 
-        if ($this->client->fault)
-        {
-            $this->errors[] = $this->client->faultstring; 
+        $result = $this->client->call('archive', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
+
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             return false;
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
+            } else {
                 return $result;
             }
         }
@@ -942,55 +938,43 @@ class YsApi
 
     /**
      * Fonction permettant de récupérer une archive
-     * @param idDemand : id de la demande à confirmer
-     * @param idFile : id du fichier signé à récupérer
-     * @ TODO : récupérer tous les fichiers d'un coup (dans un zip)
-     * @ TODO : cette fonction doit remplacer getSignedFilesFromDemand()
+     *
+     * @param $iua
+     * @return bool|string
      */
     public function getArchivedFile($iua)
-    {            
+    {
         // Paramètre du service de connexion
         $params = array(
-                        'iua' => $iua
+                        'iua' => $iua,
                         );
 
         $this->client = $this->setClientSoap($this->URL_WSDL_ARCHIVE);
-        
+
         $result = $this->client->call('getArchive', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
 
-        if ($this->client->fault) 
-        {   
-            $this->errors[] = $this->client->faultstring; 
-            
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             // La demande n'est pas associée à l'utilisateur
-            if(strstr($this->client->faultstring, "is not associated with the user"))
-            {                    
-                return "DEMAND_NOT_ALLOWED";
-            }
-            else
-            {
+            if (strstr($this->client->faultstring, 'is not associated with the user')) {
+                return 'DEMAND_NOT_ALLOWED';
+            } else {
                 // La demande n'a pas été validée, il est impossible de récupérer les fichiers signés
-                if(strstr($this->client->faultstring, "has not been signed. Impossible to get signed files"))
-                {
-                    return "DEMAND_NOT_CONFIRMED";
-                }
-                else
-                {
+                if (strstr($this->client->faultstring, 'has not been signed. Impossible to get signed files')) {
+                    return 'DEMAND_NOT_CONFIRMED';
+                } else {
                     // Une erreur inconnue est apparue
                     return false;
                 }
             }
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
+            } else {
                 // Tableau contenant :
                 //      - fileName : le nom du fichier
                 //      - file : le fichier signé
@@ -1003,110 +987,108 @@ class YsApi
      * FIN WEB SERVICES D'ARCHIVAGE
      ***********************************************************/
 
-
-
     /***********************************************************
      * METHODES PRIVEES
-     ***********************************************************/    
+     ***********************************************************/
 
     /**
-     * Permet de mettre en place le client de la requête en fonction du WSDL
-     * @param urlWsdl : url du WSDL à traiter
-     * @return Client SOAP
+     * Permet de mettre en place le client de la requête en fonction du WSDL.
+     *
+     * @param $urlWsdl
+     * @return \nusoap_client
      */
     private function setClientSoap($urlWsdl)
     {
         // Instanciation du client SOAP
-        $this->client = new \nusoap_client($urlWsdl, false , false, false, false, false, 0, 1000);
+        $this->client = new \nusoap_client($urlWsdl, false, false, false, false, false, 0, 1000);
 
         $this->client->soap_defencoding = 'UTF-8';
-        $this->client->decode_utf8 = false;         
-             
+        $this->client->decode_utf8 = false;
+
         // Mise en place des options CURL
         // Option curl
         $this->client->setUseCurl(true);
 
         // Mise en place du SSl si on l'active
-        if($this->enabledSSL)
-        {
+        if ($this->enabledSSL) {
             // Mise en place des données d'authentification SSL
             $certRequest = array(
-                'cainfofile' => $this->caChainClientLocation, 
-                'sslcertfile' => $this->certClientLocation, 
-                'sslkeyfile' => $this->privateKeyClientLocation, 
-                'passphrase' => $this->privateKeyClientPassword
-            ); 
-            
+                'cainfofile' => $this->caChainClientLocation,
+                'sslcertfile' => $this->certClientLocation,
+                'sslkeyfile' => $this->privateKeyClientLocation,
+                'passphrase' => $this->privateKeyClientPassword,
+            );
+
             $this->client->setCredentials('', '', 'certificate', $certRequest);
             $this->client->setCurlOption(CURLOPT_SSLVERSION, 3);
             // @TODO : cette option sera à mettre à true. On utilisera un fichier contenant l'AC Yousign en tant que trustore
             $this->client->setCurlOption(CURLOPT_SSL_VERIFYPEER, false);
         }
-                        
+
         // @TODO : voir comment on lève une exception
         $err = $this->client->getError();
-        if ($err) 
-        {
-            echo '<h2>Constructor error</h2><pre>' . $err . '</pre>';
-            echo '<h2>Debug</h2><pre>' . htmlspecialchars($this->client->getDebug(), ENT_QUOTES) . '</pre>';
+        if ($err) {
+            echo '<h2>Constructor error</h2><pre>'.$err.'</pre>';
+            echo '<h2>Debug</h2><pre>'.htmlspecialchars($this->client->getDebug(), ENT_QUOTES).'</pre>';
             exit();
-        }       
-        
+        }
+
         return $this->client;
     }
 
     /**
-     * Permet de générer les headers nécessaire à l'authentification de l'utilisateur final
-     * @return String : headers contenant le login et le mot de passe de l'utilisateur final
+     * Permet de générer les headers nécessaire à l'authentification de l'utilisateur final.
+     *
+     * @param bool $withUser
+     * @return string
      */
     private function createHeaders($withUser = true)
     {
-        if($withUser === true)
-        {
-          return  '<apikey>'.$this->apikey.'</apikey>' . 
-                  '<username>'.$this->_login.'</username>' . 
+        if ($withUser === true) {
+            return  '<apikey>'.$this->apikey.'</apikey>'.
+                  '<username>'.$this->_login.'</username>'.
                   '<password>'.$this->_password.'</password>';
-        }
-        else
-        {
-            return '<apikey>'.$this->apikey.'</apikey>';   
+        } else {
+            return '<apikey>'.$this->apikey.'</apikey>';
         }
     }
 
     /**
-     * Parse le fichier de configuration
-     * 
-     * @param  string $pathParametersFile Chemin du fichier de configuration
-     * @return YousignAPI_YsApi
+     * Parse le fichier de configuration.
+     *
+     * @param $pathParametersFile
+     * @return $this
      */
     private function parseParametersFile($pathParametersFile)
     {
         $this->parameters = parse_ini_file($pathParametersFile, true);
-        
-        if(isset($this->parameters['environment']))
+
+        if (isset($this->parameters['environment'])) {
             $this->setEnvironment($this->parameters['environment']);
-        
-        if(isset($this->parameters['login'])) 
+        }
+
+        if (isset($this->parameters['login'])) {
             $this->setLogin($this->parameters['login']);
-        
-        if(isset($this->parameters['password'])) 
-        {
+        }
+
+        if (isset($this->parameters['password'])) {
             $password = $this->parameters['password'];
-            if(empty($this->parameters['isEncryptedPassword']) 
+            if (empty($this->parameters['isEncryptedPassword'])
             || $this->parameters['isEncryptedPassword'] === false
-            || $this->parameters['isEncryptedPassword'] === 'false')
+            || $this->parameters['isEncryptedPassword'] === 'false') {
                 $password = $this->encryptPassword($password);
+            }
 
             $this->setPassword($password);
         }
-        
-        if(isset($this->parameters['api_key']))
-            $this->setApiKey($this->parameters['api_key']);
 
-        if(isset($this->parameters['ssl_enabled'])) 
-        {
+        if (isset($this->parameters['api_key'])) {
+            $this->setApiKey($this->parameters['api_key']);
+        }
+
+        if (isset($this->parameters['ssl_enabled'])) {
             $this->setEnabledSSL($this->parameters['ssl_enabled']);
-            
+
             $this->setCertClientLocation($this->parameters['cert_client_location']);
             $this->setCaChainClientLocation($this->parameters['ca_chain_client_location']);
             $this->setPrivateKeyClientLocation($this->parameters['private_key_client_location']);
@@ -1117,9 +1099,10 @@ class YsApi
     }
 
     /**
-     * Récupère les informations d'une cosignature
-     * 
-     * @param  array  $parameters
+     * Récupère les informations d'une cosignature.
+     *
+     * @param array $parameters
+     * @param bool $auth_required
      * @return mixed
      */
     private function getCosignInfo(array $parameters, $auth_required = true)
@@ -1127,81 +1110,65 @@ class YsApi
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
         $result = $this->client->call('getInfosFromCosignatureDemand', $parameters, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders($auth_required));
 
-        if ($this->client->fault) 
-        {
-            $this->errors[] = $this->client->faultstring; 
-            if(isset($parameters['token']) && strstr(strtolower($this->client->faultstring), 'invalid token')) {
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+            if (isset($parameters['token']) && strstr(strtolower($this->client->faultstring), 'invalid token')) {
                 return 'INVALID_TOKEN';
-            } 
-            else if(isset($parameters['idDemand']) && strstr($this->client->faultstring, 'is not associated with the user')) {
+            } elseif (isset($parameters['idDemand']) && strstr($this->client->faultstring, 'is not associated with the user')) {
                 return 'DEMAND_NOT_ALLOWED';
-            } 
-            else {
+            } else {
                 return false;
-            }            
-        } 
-        else 
-        {
+            }
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
-                $this->errors = $err; 
+            if ($err) {
+                $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
+            } else {
                 return $result;
             }
         }
     }
 
     /**
-     * Récupère un fichier de cosignature 
-     * 
-     * @param  array  $parameters
+     * Récupère un fichier de cosignature.
+     *
+     * @param array $parameters
+     * @param bool $auth_required
      * @return mixed
      */
     private function getCosignedFile(array $parameters, $auth_required = true)
     {
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
-        $result = $this->client->call('getCosignedFilesFromDemand', $parameters, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders($auth_required));                                    
+        $result = $this->client->call('getCosignedFilesFromDemand', $parameters, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders($auth_required));
 
-        if ($this->client->fault) 
-        { 
-            $this->errors[] = $this->client->faultstring;   
-            
+        if ($this->client->fault) {
+            $this->errors[] = $this->client->faultstring;
+
             // La demande n'est pas associée à l'utilisateur
-            if(strstr($this->client->faultstring, "is not associated with the user"))
-            {     
-                return "DEMAND_NOT_ALLOWED";
-            }
-            else
-            {
+            if (strstr($this->client->faultstring, 'is not associated with the user')) {
+                return 'DEMAND_NOT_ALLOWED';
+            } else {
                 // La demande n'a pas été validée, il est impossible de récupérer les fichiers signés
-                if(strstr($this->client->faultstring, "has not been signed. Impossible to get signed files"))
-                {
-                    return "DEMAND_NOT_CONFIRMED";
-                }
-                else
-                {
-                    // Une erreur inconnue est apparue 
+                if (strstr($this->client->faultstring, 'has not been signed. Impossible to get signed files')) {
+                    return 'DEMAND_NOT_CONFIRMED';
+                } else {
+                    // Une erreur inconnue est apparue
                     return false;
                 }
             }
-        } 
-        else 
-        {
+        } else {
             $err = $this->client->getError();
-            if ($err) 
-            {
+            if ($err) {
                 $this->errors = $err;
+
                 return false;
-            } 
-            else 
-            {
+            } else {
                 $res = isset($result['fileName']) ?
                     $result : $result[0];
-                return $res;                   
+
+                return $res;
             }
         }
     }
@@ -1210,4 +1177,3 @@ class YsApi
      * FIN DES METHODES PRIVEES
      ***********************************************************/
 }
-
