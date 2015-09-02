@@ -130,7 +130,7 @@ class YsApi
     /**
      * Instance du client.
      *
-     * @var SoapClient
+     * @var \nusoap_client
      */
     private $client;
 
@@ -145,9 +145,7 @@ class YsApi
      *     - password   : Mot de passe Yousign
      *     - api_key    : La clé d'API
      *
-     * @param $pathParametersFile : Chemin du fichier de configuration
-     *
-     * @return YousignAPI_YsApi
+     * @param null $pathParametersFile : Chemin de configuration
      */
     public function __construct($pathParametersFile = null)
     {
@@ -157,9 +155,10 @@ class YsApi
     }
 
     /**
-     * Modifie l'environnement de l'API utilisé.
+     * Modifie l'environnement de l'API utilisé. (env|prod)
      *
-     * @param string $environment (demo|prod)
+     * @param $environment
+     * @return $this
      */
     public function setEnvironment($environment)
     {
@@ -184,9 +183,8 @@ class YsApi
     /**
      * Modifie l'url d'accès à l'API.
      *
-     * @param string $urlApi
-     *
-     * @return YousignAPI_YsApi
+     * @param $urlApi
+     * @return $this
      */
     public function setUrlApi($urlApi)
     {
@@ -203,9 +201,8 @@ class YsApi
     /**
      * Modifie l'URL d'accès à l'Iframe.
      *
-     * @param string $urlIframe
-     *
-     * @return YousignAPI_YsApi
+     * @param $urlIframe
+     * @return $this
      */
     public function setUrlIframe($urlIframe)
     {
@@ -217,9 +214,8 @@ class YsApi
     /**
      * Modification de l'identifiant d'accès à l'API.
      *
-     * @param string $login
-     *
-     * @return YousignAPI_YsApi
+     * @param $login
+     * @return $this
      */
     public function setLogin($login)
     {
@@ -231,7 +227,8 @@ class YsApi
     /**
      * Modification du mot de passe d'accès à l'API.
      *
-     * @param string $password mot de passe encodé
+     * @param $password
+     * @return $this
      */
     public function setPassword($password)
     {
@@ -243,9 +240,8 @@ class YsApi
     /**
      * Modification de la clé d'API Yousign.
      *
-     * @param string $apikey clé d'API
-     *
-     * @return YousignAPI_YsApi
+     * @param $apikey
+     * @return $this
      */
     public function setApiKey($apikey)
     {
@@ -257,9 +253,8 @@ class YsApi
     /**
      * Active ou non l'utilisation de SSL.
      *
-     * @param bool $enabled
-     *
-     * @return YousignAPI_YsApi
+     * @param $enabled
+     * @return $this
      */
     public function setEnabledSSL($enabled)
     {
@@ -271,9 +266,8 @@ class YsApi
     /**
      * Modification de l'emplacement de la chaine de certification.
      *
-     * @param string $ca_chain_client_location the ca chain client location
-     *
-     * @return YousignAPI_YsApi
+     * @param $ca_chain_client_location
+     * @return $this
      */
     public function setCaChainClientLocation($ca_chain_client_location)
     {
@@ -285,9 +279,8 @@ class YsApi
     /**
      * Modification de l'emplacement de la clef privée client  (SSL doit être actif).
      *
-     * @param string $privateKeyClientLocation the private key client location
-     *
-     * @return YousignAPI_YsApi
+     * @param $privateKeyClientLocation
+     * @return $this
      */
     public function setPrivateKeyClientLocation($privateKeyClientLocation)
     {
@@ -299,9 +292,8 @@ class YsApi
     /**
      * Modification du mot de passe de la clef privée client  (SSL doit être actif).
      *
-     * @param string $privateKeyClientPassword the private key client password
-     *
-     * @return YousignAPI_YsApi
+     * @param $privateKeyClientPassword
+     * @return $this
      */
     public function setPrivateKeyClientPassword($privateKeyClientPassword)
     {
@@ -313,9 +305,8 @@ class YsApi
     /**
      * Modification de l'emplacement du keystore client (SSL doit être actif).
      *
-     * @param string $certClientLocation the cert client location
-     *
-     * @return YousignAPI_YsApi
+     * @param $certClientLocation
+     * @return $this
      */
     public function setCertClientLocation($certClientLocation)
     {
@@ -327,9 +318,8 @@ class YsApi
     /**
      * Cryptage du mot de passe.
      *
-     * @param string $password mot de passe en clair
-     *
-     * @return string mot de passe crypté
+     * @param $password
+     * @return string
      */
     public function encryptPassword($password)
     {
@@ -340,7 +330,6 @@ class YsApi
      * Retourne l'url d'accès à l'iframe de signature du document.
      *
      * @param string $token
-     *
      * @return string
      */
     public function getIframeUrl($token = '')
@@ -369,7 +358,7 @@ class YsApi
     /**
      * Retourne l'instance du client soap utilisé.
      *
-     * @return SoapClient
+     * @return \SoapClient
      */
     public function getClient()
     {
@@ -377,9 +366,9 @@ class YsApi
     }
 
     /**
-     * fonction de connexion à l'API.
+     * Connexion à l'API.
      *
-     * @return TRUE si l'utilisateur peut se connecter, FALSE sinon
+     * @return bool
      */
     public function connect()
     {
@@ -418,7 +407,6 @@ class YsApi
      * Fonction permettant d'obtenir des informations sur une demande de cosignature spécifique.
      *
      * @param int $idDemand Id de la demande de cosignature
-     *
      * @return mixed Retourne :
      *               - DEMAND_NOT_ALLOWED si l'id de la demande passé est incorrect
      *               - false si une erreur est survenue
@@ -427,22 +415,22 @@ class YsApi
      *               - description : Description de la demande de signature
      *               - status : Status global de la demande de signature
      *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *               * idFile : Id du fichier
-     *               * fileName : Nom du fichier
-     *               * cosignersWithStatus : Status de la signature pour chacun des signataires
-     *               + id : Id du signataire
-     *               + status : Status de la signature
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
      *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *               * firstName : Prénom
-     *               * lastName : Nom
-     *               * mail : Email
-     *               * proofLevel : Niveau de preuve de la signature
-     *               * isCosignerCalling : True si le token est associé au signataire, false sinon
-     *               * id : Id du signataire
-     *               * phone : Numéro de téléphone du signataire
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
+     *                   * proofLevel : Niveau de preuve de la signature
+     *                   * isCosignerCalling : True si le token est associé au signataire, false sinon
+     *                   * id : Id du signataire
+     *                   * phone : Numéro de téléphone du signataire
      *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *               * name : Nom + Prénom
-     *               * email : Email
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
     public function getCosignInfoFromIdDemand($idDemand)
     {
@@ -453,7 +441,6 @@ class YsApi
      * Fonction permettant de récupérer les informations d'une demande de co-signature en fonction du token.
      *
      * @param string $token : Token unique associé à une demande de cosignature
-     *
      * @return mixed Retourne :
      *               - INVALID_TOKEN si le token passé est incorrect
      *               - false si une erreur est survenue
@@ -462,22 +449,22 @@ class YsApi
      *               - description : Description de la demande de signature
      *               - status : Status global de la demande de signature
      *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *               * idFile : Id du fichier
-     *               * fileName : Nom du fichier
-     *               * cosignersWithStatus : Status de la signature pour chacun des signataires
-     *               + id : Id du signataire
-     *               + status : Status de la signature
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
      *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *               * firstName : Prénom
-     *               * lastName : Nom
-     *               * mail : Email
-     *               * proofLevel : Niveau de preuve de la signature
-     *               * isCosignerCalling :
-     *               * id : Id du signataire
-     *               * phone : Numéro de téléphone du signataire
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
+     *                   * proofLevel : Niveau de preuve de la signature
+     *                   * isCosignerCalling :
+     *                   * id : Id du signataire
+     *                   * phone : Numéro de téléphone du signataire
      *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *               * name : Nom + Prénom
-     *               * email : Email
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
     public function getCosignInfoFromToken($token)
     {
@@ -489,14 +476,13 @@ class YsApi
      *
      * @param int $idDemand : Id de la demande de cosignature
      * @param int $idFile   : Id du fichier signé à récupérer
-     *
      * @return mixed Retourne :
      *               - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
      *               - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée
      *               - false si une erreur est survenue
      *               - un tableau contenant:
-     *               -> fileName : Le nom du fichier
-     *               -> file : Le fichier signé encodé en base64
+     *                   -> fileName : Le nom du fichier
+     *                   -> file : Le fichier signé encodé en base64
      */
     public function getCosignedFileFromIdDemand($idDemand, $idFile)
     {
@@ -508,16 +494,13 @@ class YsApi
      *
      * @param string $token  : Token unique associé à un signataire non enregistré
      * @param int    $idFile : Id du fichier signé à récupérer
-     *
      * @return mixed Retourne :
      *               - DEMAND_NOT_ALLOWED si la demande n'est pas associée à l'utilisateur
      *               - DEMAND_NOT_CONFIRMED si la demande n'a pas été validée
      *               - false si une erreur est survenue
      *               - un tableau contenant:
-     *               -> fileName : Le nom du fichier
-     *               -> file : Le fichier signé encodé en base64
-     *
-     * @todo récupérer tous les fichiers d'un coup (dans un zip)
+     *                   -> fileName : Le nom du fichier
+     *                   -> file : Le fichier signé encodé en base64
      */
     public function getCosignedFileFromToken($token, $idFile)
     {
@@ -527,6 +510,7 @@ class YsApi
     /**
      * Cette méthode est utilisée pour initialiser une demande de cosignature.
      * Vous passerez en paramètre une liste de fichiers à signer ainsi qu'une liste d'informations des cosignataires.
+     *
      * Ils recevront ensuite un email contenant une URL unique pour accéder à l'interface de signature du/des documents afin de le/les signer.
      *
      * example:
@@ -605,48 +589,48 @@ class YsApi
      *     );
      *
      * @param array  $lstFiles       : Liste du/des fichiers à signer, chaque fichier doit définir:
-     *                               - name : Nom du fichier à signer
-     *                               - content : Contenu du fichier à signer encodé en base64
-     *                               - idFile : identifiant unique (entier ou chaine de caractère)
+     *                                   - name : Nom du fichier à signer
+     *                                   - content : Contenu du fichier à signer encodé en base64
+     *                                   - idFile : identifiant unique (entier ou chaine de caractère)
      * @param array  $lstPersons     : Liste des cosignataires, chaque cosignataire doit définir:
-     *                               - firstName : Le prénom du cosignataire
-     *                               - lastName : Le nom du cosignataire
-     *                               - mail : L'email du cosignataire (ou un id si c'est en mode Iframe)
-     *                               - phone : Le numéro de téléphone du cosignataire (indicatif requis, exemple: +33612326554)
-     *                               - proofLevel : Niveau de preuve
-     *                               Disponible: LOW
-     *                               Par défaut: Rien
+     *                                   - firstName : Le prénom du cosignataire
+     *                                   - lastName : Le nom du cosignataire
+     *                                   - mail : L'email du cosignataire (ou un id si c'est en mode Iframe)
+     *                                   - phone : Le numéro de téléphone du cosignataire (indicatif requis, exemple: +33612326554)
+     *                                   - proofLevel : Niveau de preuve
+     *                                       Disponible: LOW
+     *                                       Par défaut: Rien
      * @param array  $visibleOptions : Liste d'informations requis pour le placement des signatures
-     *                               - visibleSignaturePage : Numéro de la page contenant les signatures
-     *                               - isVisibleSignature : Affiche ou non la signature sur le document
-     *                               - visibleRectangleSignature : Les coordonnées de l'image de signature (ignoré si "isVisibleSignature" est à false)
-     *                               Le format est "llx,lly,urx,ury" avec:
-     *                               * llx: left lower x coordinate
-     *                               * lly: left lower y coordinate
-     *                               * urx: upper right x coordinate
-     *                               * ury: upper right y coordinate
-     *                               - mail : Email du cosignataire associée à la signature
+     *                                   - visibleSignaturePage : Numéro de la page contenant les signatures
+     *                                   - isVisibleSignature : Affiche ou non la signature sur le document
+     *                                   - visibleRectangleSignature : Les coordonnées de l'image de signature (ignoré si "isVisibleSignature" est à false)
+     *                                     Le format est "llx,lly,urx,ury" avec:
+     *                                         * llx: left lower x coordinate
+     *                                         * lly: left lower y coordinate
+     *                                         * urx: upper right x coordinate
+     *                                         * ury: upper right y coordinate
+     *                                   - mail : Email du cosignataire associée à la signature
      * @param string $message        : Message de l'email qui sera envoyé aux cosignataires (Non utilisé si initMailXXX définis)
      * @param array  $options        : Tableau d'options facultatifs
-     *                               - initMailSubject : Sujet de l'email envoyé à tous les cosignataires à la création de la cosignature (Non utilisé en mode Iframe)
-     *                               - initMail : Corps de l'email envoyé à tous les cosignataires à la création de la cosignature.
-     *                               Il doit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
-     *                               d'accès à l'interface de signature du/des documents. (Non utilisé en mode Iframe)
-     *                               - endMailSubject : Sujet de l'email envoyé lorsque tous les cosignataires ont signés le/les documents (Non utilisé en mode Iframe)
-     *                               - endMail : Corps de l'email envoyé lorsque tous les cosignataires ont signés le/les documents
-     *                               Il dit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
-     *                               d'accès à l'interface listant le/les documents signés (Non utilisé en mode Iframe)
-     *                               - language : Langue définie pour la cosignature.
-     *                               Disponibles: FR|EN|DE
-     *                               Par défaut: FR
-     *                               - mode :     Mode d'utilisation (Aucun par défaut)
-     *                               * IFRAME : Permet de signer directement dans l'application hébergeant l'iframe
-     *                               Ceci retournera un token pour chaque signataire
-     *                               L'URL devant appeler l'Iframe est:
-     *                               => (Démo) https://demo.yousign.fr/public/ext/cosignature/{token}
-     *                               => (Prod) https://yousign.fr/public/ext/cosignature/{token}
-     *                               - archive : Booléen permettant d'activer l'archivage du/des documents signés automatiquement
-     *                               L'archivage se fait lorsque tous les cosignataires ont signés
+     *                                   - initMailSubject : Sujet de l'email envoyé à tous les cosignataires à la création de la cosignature (Non utilisé en mode Iframe)
+     *                                   - initMail : Corps de l'email envoyé à tous les cosignataires à la création de la cosignature.
+     *                                     Il doit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
+     *                                     d'accès à l'interface de signature du/des documents. (Non utilisé en mode Iframe)
+     *                                   - endMailSubject : Sujet de l'email envoyé lorsque tous les cosignataires ont signés le/les documents (Non utilisé en mode Iframe)
+     *                                   - endMail : Corps de l'email envoyé lorsque tous les cosignataires ont signés le/les documents
+     *                                     Il dit être en HTML et contenir la balise {yousignUrl} qui sera remplacée par l'URL
+     *                                     d'accès à l'interface listant le/les documents signés (Non utilisé en mode Iframe)
+     *                                   - language : Langue définie pour la cosignature.
+     *                                     Disponibles: FR|EN|DE
+     *                                     Par défaut: FR
+     *                                   - mode :     Mode d'utilisation (Aucun par défaut)
+     *                                       * IFRAME : Permet de signer directement dans l'application hébergeant l'iframe
+     *                                         Ceci retournera un token pour chaque signataire
+     *                                         L'URL devant appeler l'Iframe est:
+     *                                             => (Démo) https://demo.yousign.fr/public/ext/cosignature/{token}
+     *                                             => (Prod) https://yousign.fr/public/ext/cosignature/{token}
+     *                                   - archive : Booléen permettant d'activer l'archivage du/des documents signés automatiquement
+     *                                     L'archivage se fait lorsque tous les cosignataires ont signés
      *
      * @return mixed : Id de la demande de cosignature créée et liste des id des fichiers à signer
      *               Si le mode "IFRAME" est définie, un token sera également retournée pour chaque cosignataire
@@ -766,23 +750,22 @@ class YsApi
      *               - dateCreation : Date de creation de la demande de signature
      *               - status : Status global de la demande de signature
      *               - fileInfos : Tableau contenant la liste des informations des fichiers à signer/signés
-     *               * idFile : Id du fichier
-     *               * fileName : Nom du fichier
-     *               * cosignersWithStatus : Status de la signature pour chacun des signataires
-     *               + id : Id du signataire
-     *               + status : Status de la signature
+     *                   * idFile : Id du fichier
+     *                   * fileName : Nom du fichier
+     *                   * cosignersWithStatus : Status de la signature pour chacun des signataires
+     *                       + id : Id du signataire
+     *                       + status : Status de la signature
      *               - cosignerInfos : Tableau contenant la liste des informations du/des signataires
-     *               * firstName : Prénom
-     *               * lastName : Nom
-     *               * mail : Email
+     *                   * firstName : Prénom
+     *                   * lastName : Nom
+     *                   * mail : Email
      *               - initiator : Tableau contenant les informations de l'initiateur de la demande de signature
-     *               * name : Nom + Prénom
-     *               * email : Email
+     *                   * name : Nom + Prénom
+     *                   * email : Email
      */
     public function getListCosign(array $options = array())
     {
         // Paramètre du service de connexion
-        // @todo supprimer ce paramètre ??
         $params = $options;
         $this->client = $this->setClientSoap($this->URL_WSDL_COSIGN);
         $result = $this->client->call('getListCosign', $params, self::API_NAMESPACE, self::API_NAMESPACE, $this->createHeaders());
@@ -816,8 +799,7 @@ class YsApi
     /**
      * Permet de supprimer une co-signature.
      *
-     * @param int $idDemand Id de la demande de cosignature à supprimer
-     *
+     * @param $idDemand : Id de la demande de cosignature à supprimer
      * @return bool
      */
     public function deleteCosignDemand($idDemand)
@@ -851,9 +833,8 @@ class YsApi
     /**
      * Permet de relancer les co-signataires n'ayant pas signé lors d'une demande de cosignature.
      *
-     * @param int $idDemand : Id de la demande de cosignature
-     *
-     * @return booléen
+     * @param $idDemand : Id de la demande de cosignature
+     * @return bool
      */
     public function alertCosigners($idDemand)
     {
@@ -886,9 +867,9 @@ class YsApi
     }
 
     /**
-     * Permet de retourner l'état d'authentification de l'utilisateur courant.
+     * Retourne l'état d'authentification de l'utilisateur courant.
      *
-     * @return TRUE si l'utilisateur est authentifié, FALSE sinon
+     * @return bool
      */
     public function isAuthenticated()
     {
@@ -902,12 +883,20 @@ class YsApi
     /**
      * Fonction permettant d'archiver un ensemble de documents.
      *
-     * @param @TODO : commenter les params
+     * @param $fileB64
+     * @param $fileName
+     * @param $subject
+     * @param $date2
+     * @param $type
+     * @param $author
+     * @param $comment
+     * @param $ref
+     * @param $amount
+     * @param $tagsLst
+     * @return bool
      */
     public function archive($fileB64, $fileName, $subject, $date2, $type, $author, $comment, $ref, $amount, $tagsLst)
     {
-        $payload = '';
-
         $this->client = $this->setClientSoap($this->URL_WSDL_ARCHIVE);
 
         // Construction du tableau des paramètres
@@ -948,12 +937,10 @@ class YsApi
     }
 
     /**
-     * Fonction permettant de récupérer une archive.
+     * Fonction permettant de récupérer une archive
      *
-     * @param idDemand : id de la demande à confirmer
-     * @param idFile : id du fichier signé à récupérer
-     * @ TODO : récupérer tous les fichiers d'un coup (dans un zip)
-     * @ TODO : cette fonction doit remplacer getSignedFilesFromDemand()
+     * @param $iua
+     * @return bool|string
      */
     public function getArchivedFile($iua)
     {
@@ -1007,9 +994,8 @@ class YsApi
     /**
      * Permet de mettre en place le client de la requête en fonction du WSDL.
      *
-     * @param urlWsdl : url du WSDL à traiter
-     *
-     * @return Client SOAP
+     * @param $urlWsdl
+     * @return \nusoap_client
      */
     private function setClientSoap($urlWsdl)
     {
@@ -1053,7 +1039,8 @@ class YsApi
     /**
      * Permet de générer les headers nécessaire à l'authentification de l'utilisateur final.
      *
-     * @return String : headers contenant le login et le mot de passe de l'utilisateur final
+     * @param bool $withUser
+     * @return string
      */
     private function createHeaders($withUser = true)
     {
@@ -1069,9 +1056,8 @@ class YsApi
     /**
      * Parse le fichier de configuration.
      *
-     * @param string $pathParametersFile Chemin du fichier de configuration
-     *
-     * @return YousignAPI_YsApi
+     * @param $pathParametersFile
+     * @return $this
      */
     private function parseParametersFile($pathParametersFile)
     {
@@ -1116,7 +1102,7 @@ class YsApi
      * Récupère les informations d'une cosignature.
      *
      * @param array $parameters
-     *
+     * @param bool $auth_required
      * @return mixed
      */
     private function getCosignInfo(array $parameters, $auth_required = true)
@@ -1149,7 +1135,7 @@ class YsApi
      * Récupère un fichier de cosignature.
      *
      * @param array $parameters
-     *
+     * @param bool $auth_required
      * @return mixed
      */
     private function getCosignedFile(array $parameters, $auth_required = true)
