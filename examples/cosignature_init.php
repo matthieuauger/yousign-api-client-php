@@ -46,14 +46,16 @@ $listPerson = array (
         'lastName' => 'Dupont',
         'mail' => 'jean.dupont@hostname.com',
         'phone' => '+33623456789',
-        'proofLevel' => 'LOW'
+        'proofLevel' => 'LOW',
+        'authenticationMode' => 'sms'
     ),
     array (
         'firstName' => 'Hervé',
         'lastName' => 'Martin',
         'mail' => 'hmartin@hostname.com',
         'phone' => '+33632654987',
-        'proofLevel' => 'LOW'
+        'proofLevel' => 'LOW',
+        'authenticationMode' => 'sms'
     )
 );
 
