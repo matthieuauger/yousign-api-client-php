@@ -9,7 +9,6 @@
  * ----------
  *
  * L'utilisateur doit être authentifié (cf l'exemple: 'connection.php')
- * 
  */
 
 // Inclusion du loader
@@ -26,74 +25,71 @@ $pathFile1 = dirname(__FILE__).'/documents/document1.pdf';
 $pathFile2 = dirname(__FILE__).'/documents/document2.pdf';
 
 // Création de la liste des fichiers à signer
-$listFiles = array (
-    array (
+$listFiles = array(
+    array(
         'name' => basename($pathFile1),
         'content' => base64_encode(file_get_contents($pathFile1)),
-        'idFile' => $pathFile1
+        'idFile' => $pathFile1,
     ),
-    array (
+    array(
         'name' => basename($pathFile2),
         'content' => base64_encode(file_get_contents($pathFile2)),
-        'idFile' => $pathFile2
-    )
+        'idFile' => $pathFile2,
+    ),
 );
 
 // Création de la liste des signataires
-$listPerson = array (
-    array (
+$listPerson = array(
+    array(
         'firstName' => 'Jean',
         'lastName' => 'Dupont',
         'mail' => 'jean.dupont@hostname.com',
         'phone' => '+33623456789',
         'proofLevel' => 'LOW',
-        'authenticationMode' => 'sms'
+        'authenticationMode' => 'sms',
     ),
-    array (
+    array(
         'firstName' => 'Hervé',
         'lastName' => 'Martin',
         'mail' => 'hmartin@hostname.com',
         'phone' => '+33632654987',
         'proofLevel' => 'LOW',
-        'authenticationMode' => 'sms'
-    )
+        'authenticationMode' => 'sms',
+    ),
 );
 
 // Placement des signatures sur le document
-$visibleOptions = array
-(
+$visibleOptions = array(
     // Placement des signatures pour le 1er document
-    $listFiles[0]['idFile'] => array
-    (
-        array (
+    $listFiles[0]['idFile'] => array(
+        array(
             'visibleSignaturePage' => '1', // Sur la 1er page
             'isVisibleSignature' => true,
             'visibleRectangleSignature' => '351,32,551,132',
-            'mail' => 'jean.dupont@hostname.com'
+            'mail' => 'jean.dupont@hostname.com',
         ),
-        array (
+        array(
             'visibleSignaturePage' => '1',
             'isVisibleSignature' => true,
             'visibleRectangleSignature' => '48,32,248,132',
-            'mail' => 'hmartin@hostname.com'
-        )
+            'mail' => 'hmartin@hostname.com',
+        ),
     ),
 
     // Placement des signatures pour le 2nd document
-    $listFiles[1]['idFile'] => array
-    (
-        array (
+    $listFiles[1]['idFile'] => array(
+        array(
             'visibleSignaturePage' => '2', // Sur la 2e page
             'isVisibleSignature' => true,
             'visibleRectangleSignature' => '351,32,551,132',
-            'mail' => 'jean.dupont@hostname.com'
+            'mail' => 'jean.dupont@hostname.com',
         ),
-        array (
+        array(
             'visibleSignaturePage' => '2',
             'isVisibleSignature' => true,
             'visibleRectangleSignature' => '48,32,248,132',
-            'mail' => 'hmartin@hostname.com'
-        )
+            'mail' => 'hmartin@hostname.com',
+        ),
     ),
 );
 
@@ -101,25 +97,23 @@ $visibleOptions = array
 $message = '';
 
 // Autres options
-$options = array 
-(
+$options = array(
     'mode' => 'IFRAME',
-    'archive' => false
+    'archive' => false,
 );
 
 // Appel du client et récupération du résultat
 $result = $client->initCoSign($listFiles, $listPerson, $visibleOptions, $message, $options);
-if($result === false) {
+if ($result === false) {
     echo 'Une erreur est survenue :';
     var_dump($client->getErrors());
-} 
-else 
-{
+} else {
     // Récupération des "tokens" et création des liens d'accès aux documents à signer
-    
+
     // S'il n'y a qu'un seul token, on met la variable sous forme de tableau
-    if(isset($result['tokens']['token']))
+    if (isset($result['tokens']['token'])) {
         $result['tokens'] = array($result['tokens']);
+    }
 
     // Remarque : 
     // ----------
@@ -127,12 +121,11 @@ else
     // En production, l'url d'accès est https://yousign.fr/public/ext/cosignature/<token>
     // 
     $links = array();
-    foreach ($result['tokens'] as $value) 
-    {
+    foreach ($result['tokens'] as $value) {
         $url = $client->getIframeUrl($value['token']);
-        $links[] =  '<li>' . 
-                        'Lien pour le signataire "'.$value['mail'].'" : ' . 
-                        '<a href="'.$url.'" target="_blank">'.$url.'</a>' .
+        $links[] = '<li>'.
+                        'Lien pour le signataire "'.$value['mail'].'" : '.
+                        '<a href="'.$url.'" target="_blank">'.$url.'</a>'.
                     '</li>';
     }
 

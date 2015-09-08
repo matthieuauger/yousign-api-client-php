@@ -3,7 +3,7 @@
 /**
  * Cet exemple permet de :
  *     - vérifier que la configuration du client soit correct 
- *     - vérifier que l'utilisateur puisse utiliser l'API
+ *     - vérifier que l'utilisateur puisse utiliser l'API.
  *
  * 
  * Remarque : 
@@ -13,7 +13,6 @@
  * 
  * L'utilisation des autres méthodes ne nécessite pas de passer obligatoirement
  * par la méthode "connect()".
- * 
  */
 
 // Inclusion du loader
@@ -29,10 +28,9 @@ $client = new \YousignAPI\YsApi($configFile);
 $client->connect();
 
 // Vérification que la connexion ait fonctionnée
-if(!$client->isAuthenticated()) {
+if (!$client->isAuthenticated()) {
     echo 'Vous n\'avez pas d\'accès à l\'API Yousign ou une erreur est survenue : ';
     var_dump($client->getErrors());
 } else {
     echo 'Félicitation, vous êtes authentifié';
 }
-

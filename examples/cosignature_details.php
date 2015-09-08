@@ -10,7 +10,6 @@
  * ----------
  *
  * L'utilisateur doit être authentifié (cf l'exemple: 'connection.php')
- * 
  */
 
 // Inclusion du loader
@@ -23,14 +22,14 @@ $configFile = dirname(__FILE__).'/../ysApiParameters.ini';
 $client = new \YousignAPI\YsApi($configFile);
 
 // Récupération de la dernière cosignature créée (voir cosignature_list.php)
-$result = $client->getListCosign(array ('count' => 1));
-if($result === false) {
+$result = $client->getListCosign(array('count' => 1));
+if ($result === false) {
     echo 'Une erreur est survenue : ';
     var_dump($client->getErrors());
     exit;
 }
 
-if(count($result) === 0) {
+if (count($result) === 0) {
     echo 'Aucune cosignature de créée pour le moment.';
     exit;
 }
@@ -40,7 +39,7 @@ $idDemand = $result[0]['cosignatureEvent'];
 $result = $client->getCosignInfoFromIdDemand($idDemand);
 
 // Affichage des résultats
-if($result === false) {
+if ($result === false) {
     echo 'Une erreur est survenue :';
     var_dump($client->getErrors());
 } else {

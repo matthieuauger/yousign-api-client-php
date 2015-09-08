@@ -10,7 +10,6 @@
  * ----------
  *
  * L'utilisateur doit être authentifié (cf l'exemple: 'connection.php')
- * 
  */
 
 // Inclusion du loader
@@ -23,14 +22,14 @@ $configFile = dirname(__FILE__).'/../ysApiParameters.ini';
 $client = new \YousignAPI\YsApi($configFile);
 
 // Récupération de la dernière cosignature créée (voir cosignature_list.php)
-$result = $client->getListCosign(array ('count' => 1));
-if($result === false) {
+$result = $client->getListCosign(array('count' => 1));
+if ($result === false) {
     echo 'Une erreur est survenue : ';
     var_dump($client->getErrors());
     exit;
 }
 
-if(count($result) === 0) {
+if (count($result) === 0) {
     echo 'Aucune cosignature de créée pour le moment.';
     exit;
 }
@@ -38,19 +37,18 @@ if(count($result) === 0) {
 $resultDetails = array();
 $downloadLinks = array();
 
-$idDemand  = $result[0]['cosignatureEvent'];
+$idDemand = $result[0]['cosignatureEvent'];
 $listFiles = $result[0]['fileInfos'];
 
 // S'il n'y a qu'un fichier, il faut mettre le résultat sous forme de array
 // pour homogénéiser
-if(isset($listFiles['idFile'])) {
+if (isset($listFiles['idFile'])) {
     $listFiles = array($listFiles);
 }
 
-foreach ($listFiles as $file)
-{
+foreach ($listFiles as $file) {
     $fileResult = $client->getCosignedFileFromIdDemand($idDemand, $file['idFile']);
-    if($fileResult === false) {
+    if ($fileResult === false) {
         echo 'Une erreur est survenue : ';
         var_dump($client->getErrors());
         exit;
@@ -61,8 +59,9 @@ foreach ($listFiles as $file)
 
     // On crée le fichier temporaire
     $pathFile = './'.$fileResult['fileName'];
-    if(!is_writable(dirname($pathFile)))
+    if (!is_writable(dirname($pathFile))) {
         throw new \RuntimeException(sprintf('The file "%s" is not writable', $pathFile));
+    }
 
     $handle = fopen($pathFile, 'w+');
     fwrite($handle, base64_decode($fileResult['file']));

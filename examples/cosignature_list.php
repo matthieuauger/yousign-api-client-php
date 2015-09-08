@@ -8,7 +8,6 @@
  * ----------
  *
  * L'utilisateur doit être authentifié (cf l'exemple: 'connection.php')
- * 
  */
 
 // Inclusion du loader
@@ -21,23 +20,23 @@ $configFile = dirname(__FILE__).'/../ysApiParameters.ini';
 $client = new \YousignAPI\YsApi($configFile);
 
 // Options de recherche
-$options = array (
-    'search'        => '',  // On recherche tout
-    'firstResult'   => 0,   // A partir du premier résultat
-    'count'         => 30,  // Nombre de résultat retourné
-    'status'        => ''   // Peu importe le statut
+$options = array(
+    'search' => '',  // On recherche tout
+    'firstResult' => 0,   // A partir du premier résultat
+    'count' => 30,  // Nombre de résultat retourné
+    'status' => '',   // Peu importe le statut
 );
 
 // Appel du client
 $result = $client->getListCosign($options);
 
 // Affichage du/des résultats
-if($result === false) {
+if ($result === false) {
     echo 'Une erreur est survenue :';
     var_dump($client->getErrors());
 } else {
     echo 'Listing des cosignatures récupérées : ';
-    
+
     foreach ($result as $value) {
         var_dump($value);
         echo '<hr />';
