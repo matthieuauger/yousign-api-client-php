@@ -2,15 +2,15 @@
 
 /**
  * Cet exemple permet de :
- *     - vérifier que la configuration du client soit correct 
+ *     - vérifier que la configuration du client soit correct
  *     - vérifier que l'utilisateur puisse utiliser l'API.
  *
- * 
- * Remarque : 
+ *
+ * Remarque :
  * ----------
- * 
+ *
  * La méthode "connect()" permet de vérifier si l'utilisateur a bien accès à l'API.
- * 
+ *
  * L'utilisation des autres méthodes ne nécessite pas de passer obligatoirement
  * par la méthode "connect()".
  */
@@ -18,11 +18,17 @@
 // Inclusion du loader
 $loader = require_once dirname(__FILE__).'/../vendor/autoload.php';
 
-// Définition du chemin de configuration
-$configFile = dirname(__FILE__).'/../ysApiParameters.ini';
+use YousignAPI\YsApi;
 
 // Création du client en passant les identifiants en paramètres
-$client = new \YousignAPI\YsApi($configFile);
+$client = new YsApi(
+    array(
+        'environment' => 'demo',
+        'login' => 'YOUR_LOGIN',
+        'password' => 'YOUR_PASSWORD',
+        'api_key' => 'YOUR_API_KEY',
+    )
+);
 
 // Connection à l'API
 $client->connect();

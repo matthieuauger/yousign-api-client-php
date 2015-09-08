@@ -26,7 +26,8 @@
     ],
     "require": {
         "php": ">=5.3",
-        "nusphere/nusoap": "0.9.5"
+        "nusphere/nusoap": "0.9.5",
+        "symfony/options-resolver": "^2.7"
     },
     "autoload" : {
         "psr-4": {"YousignAPI\\": "src/"}

@@ -15,11 +15,17 @@
 // Inclusion du loader
 $loader = require_once dirname(__FILE__).'/../vendor/autoload.php';
 
-// Définition du chemin de configuration
-$configFile = dirname(__FILE__).'/../ysApiParameters.ini';
+use YousignAPI\YsApi;
 
 // Création du client en passant les identifiants en paramètres
-$client = new \YousignAPI\YsApi($configFile);
+$client = new YsApi(
+    array(
+        'environment' => 'demo',
+        'login' => 'YOUR_LOGIN',
+        'password' => 'YOUR_PASSWORD',
+        'api_key' => 'YOUR_API_KEY',
+    )
+);
 
 // Récupération de la dernière cosignature créée (voir cosignature_list.php)
 $result = $client->getListCosign(array('count' => 1));

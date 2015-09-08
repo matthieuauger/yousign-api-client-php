@@ -64,7 +64,12 @@ require_once __DIR__.'/yousign-api-client-php/src/YsApi.php';
 require_once __DIR__.'/lib/nusoap.php';
 
 // Instance du client
-$client = new \YousignAPI\YsApi('path/ysApiParameters.ini');
+$client = new \YousignAPI\YsApi(array(
+    'environment' => 'demo',
+    'login' => 'YOUR_LOGIN',
+    'password' => 'YOUR_PASSWORD',
+    'api_key' => 'YOUR_API_KEY',
+);
 
 // ...
 ```
@@ -84,7 +89,11 @@ Commencez par définir dans votre fichier de paramètres, l'emplacement de votre
 ; Copiez/collez `ysApiParameters.ini.dist` dans `app/config/ysApiParameters.ini`
 
 [parameters]
-    yousign_parameters_file: "app/config/ysApiParameters.ini"
+    yousign_client_options:
+        environment: 'demo'
+        login: 'YOUR_LOGIN'
+        password: 'YOUR_PASSWORD'
+        api_key: 'YOUR_API_KEY'
 ```
 
 Créez ensuite le service en passant en argument le chemin du fichier de configuration.
@@ -92,14 +101,11 @@ Créez ensuite le service en passant en argument le chemin du fichier de configu
 ```yaml
 ; app/config/services.yml
 
-parameters:
-    yousign.client.class: "YousignAPI\YsApi"
-
 services:
     yousign.client:
-        class: "%yousign.client.class%"
+        class: YousignAPI\YsApi
         arguments:
-            - "%kernel.root_dir%/../%yousign_parameters_file%"
+            - %yousign_client_options%
 ```
 
 Il ne vous reste plus qu'à utiliser le client comme un service.
@@ -122,14 +128,18 @@ class HelloController extends Controller
 
 ## Configuration
 
-Renommez le fichier `ysApiParameters.ini.dist` en `ysApiParameters.ini` présent dans le répertoire `YousignAPI` 
-et placez le dans le répertoire souhaité.
+Le contructeur du client requiert un tableau de paramètres. Les options de configuration suivantes sont disponibles:
 
-Modifiez ensuite la configuration avec les paramètres ci-dessous:
-
- - `login` : Votre identifiant Yousign (adresse email)
- - `password` : Votre mot de passe
- - `api_key` : Votre clé d'API
+ - environment
+ - login
+ - password
+ - is_encrypted_password
+ - api_key
+ - ssl_enabled
+ - cert_client_location
+ - ca_chain_client_location
+ - private_key_client_location
+ - private_key_client_password
 
 ## Exemples
 
@@ -141,4 +151,3 @@ Vous pouvez ensuite lancer les scripts suivants:
  - `cosignature_list.php` : Pour lister les cosignatures créées
  - `cosignature_details.php` : Pour afficher les détails de la dernière cosignature créée
  - `cosignature_downloadFile.php` : Pour télécharger les fichiers de la dernière cosignature créée
-

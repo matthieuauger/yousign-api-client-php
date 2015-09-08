@@ -2,6 +2,8 @@
 
 namespace YousignAPI;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 class YsApi
 {
     const API_NAMESPACE = 'http://www.yousign.com';
@@ -16,303 +18,122 @@ class YsApi
     const IFRAME_URL_PROD = 'https://yousign.fr';
 
     /**
-     * URL d'accès au WSDL de l'API Yousign d'authentification.
-     *
      * @var string
      */
-    private $URL_WSDL_AUTH = '';
+    private $URL_WSDL_AUTH;
 
     /**
-     * URL d'accès au WSDL de l'API Yousign de Co-signature.
-     *
      * @var string
      */
-    private $URL_WSDL_COSIGN = '';
+    private $URL_WSDL_COSIGN;
 
     /**
-     * URL d'accès au WSDL de l'API Yousign d'archivage.
-     *
      * @var string
      */
-    private $URL_WSDL_ARCHIVE = '';
+    private $URL_WSDL_ARCHIVE;
 
     /**
-     * Contient le login de connexion au web service de l'utilisateur courant.
-     *
      * @var string
      */
-    private $_login = '';
+    private $urlApi;
 
     /**
-     * Contient le mot de passe de connexion au web service en sha1.
-     *
      * @var string
      */
-    private $_password = '';
+    private $urlIframe;
 
     /**
-     * La clé d'API.
-     *
-     * @var string
-     */
-    private $apikey = '';
-
-    /**
-     * Url d'accès à l'API.
-     *
-     * @var string
-     */
-    private $urlApi = '';
-
-    /**
-     * URL d'accès à l'Iframe.
-     *
-     * @var string
-     */
-    private $urlIframe = '';
-
-    /**
-     * Définit l'utilisation ou non du protocol SSL.
-     *
-     * @var bool
-     */
-    private $enabledSSL = false;
-
-    /**
-     * Emplacement du keystore client (SSL doit être actif).
-     *
-     * @var string
-     */
-    private $certClientLocation = '';
-
-    /**
-     * Emplacement de la chaine de certification (SSL doit être actif).
-     *
-     * @var string
-     */
-    private $caChainClientLocation = '';
-
-    /**
-     * Emplacement de la clef privée client  (SSL doit être actif).
-     *
-     * @var string
-     */
-    private $privateKeyClientLocation = '';
-
-    /**
-     * Mot de passe de la clef privée client  (SSL doit être actif).
-     *
-     * @var string
-     */
-    private $privateKeyClientPassword = '';
-
-    /**
-     * Définit si l'utilisateur est bien authentifié ou non.
-     *
      * @var bool
      */
     private $isAuthenticated = false;
 
     /**
-     * Contient les paramètres d'accès à l'api pki.
-     *
-     * @var array
-     */
-    private $parameters = null;
-
-    /**
-     * Gestion des erreurs.
-     *
      * @var array
      */
     private $errors = array();
 
     /**
-     * Instance du client.
-     *
      * @var \nusoap_client
      */
     private $client;
 
     /**
-     * Permet de créer une nouvelle instance de la classe ysApi.
-     *
-     * Il est possible de passer en paramètre le chemin d'un fichier properties (.ini)
-     *
-     * Si c'est le cas, il peut contenir les clés suivantes :
-     *     - url_api    : L'url d'accès à l'API
-     *     - login      : L'identifiant Yousign (adresse email)
-     *     - password   : Mot de passe Yousign
-     *     - api_key    : La clé d'API
-     *
-     * @param null $pathParametersFile : Chemin de configuration
+     * @var array
      */
-    public function __construct($pathParametersFile = null)
+    private $options;
+
+    public function __construct(array $options = array())
     {
-        if ($pathParametersFile !== null && file_exists($pathParametersFile)) {
-            $this->parseParametersFile($pathParametersFile);
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+
+        $this->options = $resolver->resolve($options);
+
+        if (self::API_ENV_PROD == $this->options['environment']) {
+            $this->urlIframe = self::IFRAME_URL_PROD;
+            $this->urlApi = self::API_URL_PROD;
+        } elseif (self::API_ENV_DEMO == $this->options['environment']) {
+            $this->urlIframe = self::IFRAME_URL_DEMO;
+            $this->urlApi = self::API_URL_DEMO;
         }
-    }
 
-    /**
-     * Modifie l'environnement de l'API utilisé. (env|prod)
-     *
-     * @param $environment
-     * @return $this
-     */
-    public function setEnvironment($environment)
-    {
-        switch ($environment) {
-            // Environnement de production
-            case self::API_ENV_PROD:
-                $this->setUrlIframe(self::IFRAME_URL_PROD);
-                $this->setUrlApi(self::API_URL_PROD);
-
-                return $this;
-
-            // Par défaut, environnement de démo
-            case self::API_URL_DEMO:
-            default:
-                $this->setUrlIframe(self::IFRAME_URL_DEMO);
-                $this->setUrlApi(self::API_URL_DEMO);
-
-                return $this;
-        }
-    }
-
-    /**
-     * Modifie l'url d'accès à l'API.
-     *
-     * @param $urlApi
-     * @return $this
-     */
-    public function setUrlApi($urlApi)
-    {
-        $this->urlApi = $urlApi;
-
-        // On créé les adresses des wsdl
         $this->URL_WSDL_AUTH = $this->urlApi.'/AuthenticationWS/AuthenticationWS?wsdl';
         $this->URL_WSDL_COSIGN = $this->urlApi.'/CosignWS/CosignWS?wsdl';
         $this->URL_WSDL_ARCHIVE = $this->urlApi.'/ArchiveWS/ArchiveWS?wsdl';
 
-        return $this;
+        if (true === $this->options['is_encrypted_password']) {
+            $this->options['password'] = $this->encryptPassword($this->options['password']);
+        }
     }
 
-    /**
-     * Modifie l'URL d'accès à l'Iframe.
-     *
-     * @param $urlIframe
-     * @return $this
-     */
-    public function setUrlIframe($urlIframe)
+    private function configureOptions(OptionsResolver $optionsResolver)
     {
-        $this->urlIframe = $urlIframe;
+        $optionsResolver->setDefined(
+            array(
+                'environment',
+                'login',
+                'password',
+                'is_encrypted_password',
+                'api_key',
+                'ssl_enabled',
+                'cert_client_location',
+                'ca_chain_client_location',
+                'private_key_client_location',
+                'private_key_client_password',
+            )
+        );
 
-        return $this;
-    }
+        $optionsResolver->setDefaults(
+            array(
+                'environment' => self::API_ENV_DEMO,
+                'is_encrypted_password' => true,
+                'ssl_enabled' => false,
+            )
+        );
 
-    /**
-     * Modification de l'identifiant d'accès à l'API.
-     *
-     * @param $login
-     * @return $this
-     */
-    public function setLogin($login)
-    {
-        $this->_login = $login;
+        $optionsResolver->setAllowedTypes(
+            array(
+                'environment' => 'string',
+                'login' => 'string',
+                'password' => 'string',
+                'is_encrypted_password' => 'bool',
+                'api_key' => 'string',
+                'ssl_enabled' => 'bool',
+                'cert_client_location' => 'string',
+                'ca_chain_client_location' => 'string',
+                'private_key_client_location' => 'string',
+                'private_key_client_password' => 'string',
+            )
+        );
 
-        return $this;
-    }
-
-    /**
-     * Modification du mot de passe d'accès à l'API.
-     *
-     * @param $password
-     * @return $this
-     */
-    public function setPassword($password)
-    {
-        $this->_password = $password;
-
-        return $this;
-    }
-
-    /**
-     * Modification de la clé d'API Yousign.
-     *
-     * @param $apikey
-     * @return $this
-     */
-    public function setApiKey($apikey)
-    {
-        $this->apikey = $apikey;
-
-        return $this;
-    }
-
-    /**
-     * Active ou non l'utilisation de SSL.
-     *
-     * @param $enabled
-     * @return $this
-     */
-    public function setEnabledSSL($enabled)
-    {
-        $this->enabledSSL = $enabled;
-
-        return $this;
-    }
-
-    /**
-     * Modification de l'emplacement de la chaine de certification.
-     *
-     * @param $ca_chain_client_location
-     * @return $this
-     */
-    public function setCaChainClientLocation($ca_chain_client_location)
-    {
-        $this->caChainClientLocation = $ca_chain_client_location;
-
-        return $this;
-    }
-
-    /**
-     * Modification de l'emplacement de la clef privée client  (SSL doit être actif).
-     *
-     * @param $privateKeyClientLocation
-     * @return $this
-     */
-    public function setPrivateKeyClientLocation($privateKeyClientLocation)
-    {
-        $this->privateKeyClientLocation = $privateKeyClientLocation;
-
-        return $this;
-    }
-
-    /**
-     * Modification du mot de passe de la clef privée client  (SSL doit être actif).
-     *
-     * @param $privateKeyClientPassword
-     * @return $this
-     */
-    public function setPrivateKeyClientPassword($privateKeyClientPassword)
-    {
-        $this->privateKeyClientPassword = $privateKeyClientPassword;
-
-        return $this;
-    }
-
-    /**
-     * Modification de l'emplacement du keystore client (SSL doit être actif).
-     *
-     * @param $certClientLocation
-     * @return $this
-     */
-    public function setCertClientLocation($certClientLocation)
-    {
-        $this->certClientLocation = $certClientLocation;
-
-        return $this;
+        $optionsResolver->setAllowedValues(
+            array(
+                'environment' => array(
+                    self::API_ENV_DEMO,
+                    self::API_ENV_PROD,
+                )
+            )
+        );
     }
 
     /**
@@ -1010,13 +831,13 @@ class YsApi
         $this->client->setUseCurl(true);
 
         // Mise en place du SSl si on l'active
-        if ($this->enabledSSL) {
+        if (true === $this->options['ssl_enabled']) {
             // Mise en place des données d'authentification SSL
             $certRequest = array(
-                'cainfofile' => $this->caChainClientLocation,
-                'sslcertfile' => $this->certClientLocation,
-                'sslkeyfile' => $this->privateKeyClientLocation,
-                'passphrase' => $this->privateKeyClientPassword,
+                'cainfofile' => $this->options['ca_chain_client_location'],
+                'sslcertfile' => $this->options['cert_client_location'],
+                'sslkeyfile' => $this->options['private_key_client_location'],
+                'passphrase' => $this->options['private_key_client_password'],
             );
 
             $this->client->setCredentials('', '', 'certificate', $certRequest);
@@ -1045,57 +866,12 @@ class YsApi
     private function createHeaders($withUser = true)
     {
         if ($withUser === true) {
-            return  '<apikey>'.$this->apikey.'</apikey>'.
-                  '<username>'.$this->_login.'</username>'.
-                  '<password>'.$this->_password.'</password>';
+            return  '<apikey>'.$this->options['api_key'].'</apikey>'.
+                  '<username>'.$this->options['login'].'</username>'.
+                  '<password>'.$this->options['password'].'</password>';
         } else {
-            return '<apikey>'.$this->apikey.'</apikey>';
+            return '<apikey>'.$this->options['api_key'].'</apikey>';
         }
-    }
-
-    /**
-     * Parse le fichier de configuration.
-     *
-     * @param $pathParametersFile
-     * @return $this
-     */
-    private function parseParametersFile($pathParametersFile)
-    {
-        $this->parameters = parse_ini_file($pathParametersFile, true);
-
-        if (isset($this->parameters['environment'])) {
-            $this->setEnvironment($this->parameters['environment']);
-        }
-
-        if (isset($this->parameters['login'])) {
-            $this->setLogin($this->parameters['login']);
-        }
-
-        if (isset($this->parameters['password'])) {
-            $password = $this->parameters['password'];
-            if (empty($this->parameters['isEncryptedPassword'])
-            || $this->parameters['isEncryptedPassword'] === false
-            || $this->parameters['isEncryptedPassword'] === 'false') {
-                $password = $this->encryptPassword($password);
-            }
-
-            $this->setPassword($password);
-        }
-
-        if (isset($this->parameters['api_key'])) {
-            $this->setApiKey($this->parameters['api_key']);
-        }
-
-        if (isset($this->parameters['ssl_enabled'])) {
-            $this->setEnabledSSL($this->parameters['ssl_enabled']);
-
-            $this->setCertClientLocation($this->parameters['cert_client_location']);
-            $this->setCaChainClientLocation($this->parameters['ca_chain_client_location']);
-            $this->setPrivateKeyClientLocation($this->parameters['private_key_client_location']);
-            $this->setPrivateKeyClientPassword($this->parameters['private_key_client_password']);
-        }
-
-        return $this;
     }
 
     /**
